@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+div#container{
+	--d: min(120vw,100vh);
+	--w: calc(var(--d) * 0.8333333333);
+	--h: calc(var(--d) * 1.0);
+}
+
+div#container{
+    position:absolute;
+    left: calc((100vw - var(--w)) * 0.5);
+    top:  calc((100vh - var(--h)) * 0.5);
+    width:var(--w); height:var(--h);
+}
+div#container>canvas{
+    position: absolute;
+    top: 0; left: 0;
+    width: var(--w); height: var(--h);
+	touch-action: none;
+}
