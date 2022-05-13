@@ -53,6 +53,36 @@ class Grid{
 		let piece = this.getPiece(x, y);
 		return piece.moveB(this);
 	}
+
+	toString(){
+		let res = ".".repeat(20);
+		for(let piece of this.pieces){
+			let {x,y} = piece;
+			switch(piece.constructor){
+				case SmallPiece:
+					res = Solver.setAt(res, x, y, '@');
+					break;
+				case HorizontalPiece:
+					res = Solver.setAt(res, x, y, '<');
+					res = Solver.setAt(res, x + 1, y, '>');
+					break;
+				case VerticalPiece:
+					res = Solver.setAt(res, x, y, '^');
+					res = Solver.setAt(res, x, y + 1, 'v');
+					break;
+				case LargePiece:
+					res = Solver.setAt(res, x, y, '1');
+					res = Solver.setAt(res, x + 1, y, '2');
+					res = Solver.setAt(res, x, y + 1, '3');
+					res = Solver.setAt(res, x + 1, y + 1, '4');
+					break;
+			}
+		}
+		return res;
+	}
+	fromString(){
+		
+	}
 }
 
 /** @abstract */

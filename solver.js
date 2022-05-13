@@ -293,6 +293,7 @@ var Solver = (function(){
 	}
 
 	return {
+		allowedMoves: allowedMoves,
 		getHint : hint,
 		solve : getStepsToSolve,
 		getAt: getAt,
