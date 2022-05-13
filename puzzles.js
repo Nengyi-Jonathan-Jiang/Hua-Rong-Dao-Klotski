@@ -4,7 +4,7 @@ class Level{
 		this.s = layout.trim().split('\n').map(i=>i.trim()).join('');
 	}
 	generate(){
-		let pieces = [];
+		let pieces = [null];
 		let x = 0, y = 0;
 		for(let i = 0; i < 20; i++){
 			x = i & 3, y = i >> 2;
@@ -16,7 +16,7 @@ class Level{
 					pieces.push(new HorizontalPiece(x, y));
 					break;
 				case '1':
-					pieces.push(new LargePiece(x, y));
+					pieces[0] = new LargePiece(x, y);
 					break;
 				case '@':
 					pieces.push(new SmallPiece(x, y));
