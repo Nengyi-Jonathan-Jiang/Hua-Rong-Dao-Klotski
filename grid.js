@@ -14,8 +14,18 @@ class Grid{
 	}
 
 	/** @param {number} x @param {number} y */
+	hasWall(x, y){
+		return (x > 3 || x < 0 || y > 4 || y < 0);
+	}
+
+	/** @param {number} x @param {number} y */
 	hasPiece(x, y){
-		return x > 3 || x < 0 || y > 4 || y < 0 || this.grid[x][y] != null;
+		return !this.hasWall(x, y) && this.grid[x][y] != null;
+	}
+
+	/** @param {number} x @param {number} y */
+	hasBlock(x, y){
+		return this.hasWall(x, y) || this.grid[x][y] != null;
 	}
 
 	/** @param {number} x @param {number} y @param {Piece} piece*/
@@ -49,18 +59,25 @@ class Grid{
 class Piece{
 	/** @param {number} x @param {number} y */
 	constructor(x, y, id){
-		this.x = x;
-		this.y = y;
+		this.px = this.x = x;
+		this.py = this.y = y;
 		this.id = id;
 	}
 
 	/** @abstract @param {Grid} grid */
 	place(grid){}
 
-	moveL(){this.x--;return [[-1, 0], this, 1]}
-	moveR(){this.x++;return [[ 1, 0], this, 1]}
-	moveT(){this.y--;return [[0, -1], this, 1]}
-	moveB(){this.y++;return [[0,  1], this, 1]}
+	moveL(){this.px = this.x--; return true}
+	moveR(){this.px = this.x++; return true}
+	moveT(){this.py = this.y--; return true}
+	moveB(){this.py = this.y++; return true}
+
+	_check(grid, x, y, func){
+		return !grid.hasWall(x, y) && (!grid.hasPiece(x, y) || grid.getPiece(x, y)[func](grid));
+	}
+	check(grid, func, ...positions){
+		return positions.every(([x,y]) => this._check(grid, x, y, func));
+	}
 }
 
 class SmallPiece extends Piece{
@@ -73,7 +90,7 @@ class SmallPiece extends Piece{
 	/** @override */
 	/** @param {Grid} grid */ 
 	moveL(grid){
-		if(grid.hasPiece(this.x - 1, this.y)) return null;
+		if(!this.check(grid, "moveL", [this.x - 1, this.y])) return false;
 		grid.setPiece(this.x, this.y, null);
 		grid.setPiece(this.x - 1, this.y, this);
 		return super.moveL();
@@ -81,7 +98,7 @@ class SmallPiece extends Piece{
 	/** @override */
 	/** @param {Grid} grid */ 
 	moveR(grid){
-		if(grid.hasPiece(this.x + 1, this.y)) return null;
+		if(!this.check(grid, "moveR", [this.x + 1, this.y])) return false;
 		grid.setPiece(this.x, this.y, null);
 		grid.setPiece(this.x + 1, this.y, this);
 		return super.moveR();
@@ -89,7 +106,7 @@ class SmallPiece extends Piece{
 	/** @override */
 	/** @param {Grid} grid */ 
 	moveT(grid){
-		if(grid.hasPiece(this.x, this.y - 1)) return null;
+		if(!this.check(grid, "moveT", [this.x, this.y - 1])) return false;
 		grid.setPiece(this.x, this.y, null);
 		grid.setPiece(this.x, this.y - 1, this);
 		return super.moveT();
@@ -97,7 +114,7 @@ class SmallPiece extends Piece{
 	/** @override */
 	/** @param {Grid} grid */ 
 	moveB(grid){
-		if(grid.hasPiece(this.x, this.y + 1)) return null;
+		if(!this.check(grid, "moveB", [this.x, this.y + 1])) return false;
 		grid.setPiece(this.x, this.y, null);
 		grid.setPiece(this.x, this.y + 1, this);
 		return super.moveB();
@@ -115,7 +132,7 @@ class HorizontalPiece extends Piece{
 	/** @override */
 	/** @param {Grid} grid */ 
 	moveL(grid){
-		if(grid.hasPiece(this.x - 1, this.y)) return null;
+		if(!this.check(grid, "moveL", [this.x - 1, this.y])) return false;
 		grid.setPiece(this.x + 1, this.y, null);
 		grid.setPiece(this.x - 1, this.y, this);
 		return super.moveL();
@@ -123,7 +140,7 @@ class HorizontalPiece extends Piece{
 	/** @override */
 	/** @param {Grid} grid */ 
 	moveR(grid){
-		if(grid.hasPiece(this.x + 2, this.y)) return null;
+		if(!this.check(grid, "moveR", [this.x + 2, this.y])) return false;
 		grid.setPiece(this.x, this.y, null);
 		grid.setPiece(this.x + 2, this.y, this);
 		return super.moveR();
@@ -131,7 +148,7 @@ class HorizontalPiece extends Piece{
 	/** @override */
 	/** @param {Grid} grid */ 
 	moveT(grid){
-		if(grid.hasPiece(this.x, this.y - 1) || grid.hasPiece(this.x + 1, this.y - 1)) return null;
+		if(!this.check(grid, "moveT", [this.x, this.y - 1], [this.x + 1, this.y - 1])) return false;
 		grid.setPiece(this.x, this.y, null);
 		grid.setPiece(this.x + 1, this.y, null);
 		grid.setPiece(this.x, this.y - 1, this);
@@ -141,7 +158,7 @@ class HorizontalPiece extends Piece{
 	/** @override */
 	/** @param {Grid} grid */ 
 	moveB(grid){
-		if(grid.hasPiece(this.x, this.y + 1) || grid.hasPiece(this.x + 1, this.y + 1)) return null;
+		if(!this.check(grid, "moveB", [this.x, this.y + 1], [this.x + 1, this.y + 1])) return false;
 		grid.setPiece(this.x, this.y, null);
 		grid.setPiece(this.x + 1, this.y, null);
 		grid.setPiece(this.x, this.y + 1, this);
@@ -161,7 +178,7 @@ class VerticalPiece extends Piece{
 	/** @override */
 	/** @param {Grid} grid */ 
 	moveL(grid){
-		if(grid.hasPiece(this.x - 1, this.y) || grid.hasPiece(this.x - 1, this.y + 1)) return null;
+		if(!this.check(grid, "moveL", [this.x - 1, this.y], [this.x - 1, this.y + 1])) return false;
 		grid.setPiece(this.x, this.y, null);
 		grid.setPiece(this.x, this.y + 1, null);
 		grid.setPiece(this.x - 1, this.y, this);
@@ -171,7 +188,7 @@ class VerticalPiece extends Piece{
 	/** @override */
 	/** @param {Grid} grid */ 
 	moveR(grid){
-		if(grid.hasPiece(this.x + 1, this.y) || grid.hasPiece(this.x + 1, this.y + 1)) return null;
+		if(!this.check(grid, "moveR", [this.x + 1, this.y], [this.x + 1, this.y + 1])) return false;
 		grid.setPiece(this.x, this.y, null);
 		grid.setPiece(this.x, this.y + 1, null);
 		grid.setPiece(this.x + 1, this.y, this);
@@ -181,7 +198,7 @@ class VerticalPiece extends Piece{
 	/** @override */
 	/** @param {Grid} grid */ 
 	moveT(grid){
-		if(grid.hasPiece(this.x, this.y - 1)) return null;
+		if(!this.check(grid, "moveT", [this.x, this.y - 1])) return false;
 		grid.setPiece(this.x, this.y + 1, null);
 		grid.setPiece(this.x, this.y - 1, this);
 		return super.moveT();
@@ -189,7 +206,7 @@ class VerticalPiece extends Piece{
 	/** @override */
 	/** @param {Grid} grid */ 
 	moveB(grid){
-		if(grid.hasPiece(this.x, this.y + 2)) return null;
+		if(!this.check(grid, "moveB", [this.x, this.y + 2])) return false;
 		grid.setPiece(this.x, this.y, null);
 		grid.setPiece(this.x, this.y + 2, this);
 		return super.moveB();
@@ -209,7 +226,7 @@ class LargePiece extends Piece{
 	/** @override */
 	/** @param {Grid} grid */ 
 	moveL(grid){
-		if(grid.hasPiece(this.x - 1, this.y) || grid.hasPiece(this.x - 1, this.y + 1)) return null;
+		if(!this.check(grid, "moveL", [this.x - 1, this.y], [this.x - 1, this.y + 1])) return false;
 		grid.setPiece(this.x + 1, this.y, null);
 		grid.setPiece(this.x + 1, this.y + 1, null);
 		grid.setPiece(this.x - 1, this.y, this);
@@ -219,7 +236,7 @@ class LargePiece extends Piece{
 	/** @override */
 	/** @param {Grid} grid */ 
 	moveR(grid){
-		if(grid.hasPiece(this.x + 2, this.y) || grid.hasPiece(this.x + 2, this.y + 1)) return null;
+		if(!this.check(grid, "moveR", [this.x + 2, this.y], [this.x + 2, this.y + 1])) return false;
 		grid.setPiece(this.x, this.y, null);
 		grid.setPiece(this.x, this.y + 1, null);
 		grid.setPiece(this.x + 2, this.y, this);
@@ -229,7 +246,7 @@ class LargePiece extends Piece{
 	/** @override */
 	/** @param {Grid} grid */ 
 	moveT(grid){
-		if(grid.hasPiece(this.x, this.y - 1) || grid.hasPiece(this.x + 1, this.y - 1)) return null;
+		if(!this.check(grid, "moveT", [this.x, this.y - 1], [this.x + 1, this.y - 1])) return false;
 		grid.setPiece(this.x, this.y + 1, null);
 		grid.setPiece(this.x + 1, this.y + 1, null);
 		grid.setPiece(this.x, this.y - 1, this);
@@ -239,7 +256,7 @@ class LargePiece extends Piece{
 	/** @override */
 	/** @param {Grid} grid */ 
 	moveB(grid){
-		if(grid.hasPiece(this.x, this.y + 2) || grid.hasPiece(this.x + 1, this.y + 2)) return null;
+		if(!this.check(grid, "moveB", [this.x, this.y + 2], [this.x + 1, this.y + 2])) return false;
 		grid.setPiece(this.x, this.y, null);
 		grid.setPiece(this.x + 1, this.y, null);
 		grid.setPiece(this.x, this.y + 2, this);

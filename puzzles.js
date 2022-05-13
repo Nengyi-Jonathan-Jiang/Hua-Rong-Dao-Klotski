@@ -1,127 +1,129 @@
+class Level{
+	constructor(name, layout){
+		this.name = name;
+		this.s = layout.trim().split('\n').map(i=>i.trim()).join('');
+	}
+	generate(){
+		let pieces = [];
+		let x = 0, y = 0;
+		for(let i = 0; i < 20; i++){
+			x = i & 3, y = i >> 2;
+			switch(this.s[i]){
+				case '^':
+					pieces.push(new VerticalPiece(x, y));
+					break;
+				case '<':
+					pieces.push(new HorizontalPiece(x, y));
+					break;
+				case '1':
+					pieces.push(new LargePiece(x, y));
+					break;
+				case '@':
+					pieces.push(new SmallPiece(x, y));
+					break;
+			}
+		}
+		return new Grid(pieces);
+	}
+}
+
 const LEVELS = [
-    {
-        name: "过五关",
-        generate: _=>new Grid([        
-            new LargePiece(1,0),
-
-            new HorizontalPiece(0,2),
-            new HorizontalPiece(2,2),
-            new HorizontalPiece(0,3),
-            new HorizontalPiece(2,3),
-            new HorizontalPiece(1,4),
-
-            new SmallPiece(0,0),
-            new SmallPiece(0,1),
-            new SmallPiece(3,0),
-            new SmallPiece(3,1),
-        ])
-    },
-    {
-        name: "一路顺风",
-        generate: _=>new Grid([        
-            new LargePiece(1,0),
-        
-            new HorizontalPiece(1,2),
-        
-            new VerticalPiece(0,0),
-            new VerticalPiece(0,2),
-            new VerticalPiece(2,3),
-            new VerticalPiece(3,2),
-        
-            new SmallPiece(3,0),
-            new SmallPiece(3,1),
-            new SmallPiece(1,3),
-            new SmallPiece(1,4),
-        ])
-    },
-    {
-        name: "井底之蛙",
-        generate: _=>new Grid([        
-            new LargePiece(1,1),
-
-            new HorizontalPiece(1,0),
-            new HorizontalPiece(1,3),
-            new HorizontalPiece(1,4),
-
-            new VerticalPiece(0,1),
-            new VerticalPiece(3,1),
-
-            new SmallPiece(0,0),
-            new SmallPiece(3,0),
-            new SmallPiece(0,3),
-            new SmallPiece(3,3),
-        ])
-    },
-    {
-        name: "桃花园中",
-        generate: _=>new Grid([
-            new LargePiece(1,0),
-
-            new HorizontalPiece(1,4),
-
-            new VerticalPiece(0,1),
-            new VerticalPiece(1,2),
-            new VerticalPiece(2,2),
-            new VerticalPiece(3,1),
-
-            new SmallPiece(0,0),
-            new SmallPiece(3,0),
-            new SmallPiece(0,3),
-            new SmallPiece(3,3),
-        ])
-    },
-    {
-        name: "横刀立马",
-        generate: _=>new Grid([
-            new LargePiece(1,0),
-        
-            new HorizontalPiece(1,2),
-        
-            new VerticalPiece(0,0),
-            new VerticalPiece(0,2),
-            new VerticalPiece(3,0),
-            new VerticalPiece(3,2),
-        
-            new SmallPiece(0,4),
-            new SmallPiece(1,3),
-            new SmallPiece(2,3),
-            new SmallPiece(3,4),
-        ])
-    },
-    {
-        name: "水泄不通",
-        generate: _=>new Grid([
-            new LargePiece(1,0),
-        
-            new HorizontalPiece(0,2),
-            new HorizontalPiece(2,2),
-            new HorizontalPiece(0,3),
-            new HorizontalPiece(2,3),
-
-            new VerticalPiece(0,0),
-        
-            new SmallPiece(3,0),
-            new SmallPiece(3,1),
-            new SmallPiece(0,4),
-            new SmallPiece(3,4),
-        ])
-    },
-    {
-        name: "峰回路转",
-        generate: _=>new Grid([        
-            new LargePiece(0,1),
-
-            new HorizontalPiece(1,3),
-            new HorizontalPiece(2,4),
-
-            new VerticalPiece(2,1),
-            new VerticalPiece(3,0),
-            new VerticalPiece(3,2),
-
-            new SmallPiece(0,0),
-            new SmallPiece(1,0),
-            new SmallPiece(2,0),
-            new SmallPiece(1,4),
-        ])
-    },
+    new Level("过五关", `
+		@12@
+		@34@
+		<><>
+		<><>
+		_<>_
+	`),
+	new Level('一路顺风', `
+		^12@
+		v34@
+		^<>^
+		v@^v
+		_@v_
+	`),
+    new Level("井底之蛙",`
+		@<>@
+		^12^
+		v34v
+		@<>@
+		_<>_
+	`),
+    new Level("桃花园中",`
+		@12@
+		^23^
+		v^^v
+		@vv@
+		_<>_
+	`),
+	new Level("横刀立马", `
+		^12^
+		v34v
+		^<>^
+		v@@v
+		@__@
+	`),
+	new Level("水泄不通",`
+		^12@
+		v34@
+		<><>
+		<><>
+		@__@
+	`),
+    new Level("峰回路转",`
+		@@@^
+		12^v
+		34v^
+		_<>v
+		_@<>
+	`),
+	new Level("指挥若定",`
+		^12^
+		v34v
+		@<>@
+		^@@^
+		v__v
+	`),
+	new Level("将拥曹营",`
+		_12_
+		^34^
+		v^^v
+		@vv@
+		<>@@
+	`),
+	new Level("齐头并进",`
+		^12^
+		v34v
+		@@@@
+		^<>^
+		v__v
+	`),
+	new Level("兵分三路",`
+		@12@
+		^34^
+		v<>v
+		^@@^
+		v__v
+	`),
+	new Level("雨声淅沥",`
+		^12@
+		v34@
+		^<>^
+		v_^v
+		@_v@
+	`),
+	new Level("左右布兵",`
+		@12@
+		@34@
+		^^^^
+		vvvv
+		_<>_
+	`),
+	new Level("一路进军",`
+		^12@
+		v34@
+		^^^@
+		vvv@
+		_<>_
+	`),
 ]
