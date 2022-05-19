@@ -1,21 +1,332 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
 
 body{
-	--d: min(120vw,100vh);
+	
+	--padding : 20px;
+
+	
+	--d: min((100vw - 20px) * 1.2, (100vh - 20px));
 	--w: calc(var(--d) * 0.8333333333);
 	--h: calc(var(--d) * 1.0);
+
+	overflow: hidden;
+	
+    position: absolute;
+    top: 0; left: 0;
+	width: 100vw;
+	height: 100vh;
+	margin: 0;
+	padding: 0;
 }
 
 div#container{
     position:absolute;
     left: calc((100vw - var(--w)) * 0.5);
     top:  calc((100vh - var(--h)) * 0.5);
-    width:var(--w); height:var(--h);
+    width: var(--w);
+	height: var(--h);
 }
 
 div#container>canvas{
-    position: absolute;
-    top: 0; left: 0;
-    width: var(--w); height: var(--h);
+	width: 100%;
+	height: 100%;
 	touch-action: none;
+}
+
+body{
+/* 	--background-c : #5F5449; */
+	--background-c : #FFF;
+	--background-2-c : #a58d73;
+	--small-piece-c : #4D9DE0;
+	--horizontal-piece-c : #E15554;
+	--vertical-piece-c : #FFC43D;
+	--large-piece-c : #3BB273;
+	--frame-c : #F2E2D2;
+	
+	background-color : var(--background-c);
+}
+
+
+button{
+	--size: 1;
+	--scaled-w : calc(var(--w) * var(--size));
+	border:none;
+	outline: 1px solid black;
+	font-size : calc(var(--scaled-w) * 0.05);
+	padding: calc(var(--scaled-w) * 0.015);
+	line-height: 1;
+	height: calc(var(--scaled-w) * .08);
+	border-radius : calc(var(--scaled-w) * 0.025);
+	text-align: center;
+	
+	background : #8888;
+	transition : background 0.15s;
+}
+
+button:hover{
+	background : #4448;
+}
+
+div.scene{
+	position:absolute;
+	top:0;left:0;
+	width: var(--w);
+	height : calc(var(--w) * 1.2);
+}
+
+button.game-button, button.level{
+	display:inline-block;
+	width: calc(var(--w) * .08);
+}
+
+button.level{
+	margin: calc(var(--w) * .04);
+}
+	
+button.menu-button{
+	display:block;
+	width: calc(var(--w) * .8);
+	margin: calc(var(--w) * .025) calc(var(--w) * .1);
+}
+
+div#menu-items>button{
+	--size : 1;
+}
+
+.scene[data-hidden="true"]{
+	display:none;
+}
+
+div.scene#menu{
+	text-align: center;
+}
+
+p#menu-title{
+	font-size : calc(var(--w) * .25);
+	margin : calc(var(--w) * .1);
+}
+	
+*{
+	color: black;
+  	-webkit-text-fill-color: white; /* Will override color (regardless of order) */
+  	-webkit-text-stroke-width: 1px;
+  	-webkit-text-stroke-color: black;
+
+	font-family: Arial;
+	font-weight: bold;
+
+	user-select: none;
+	touch-action:none;
+
+	outline : 1px solid black;
+	outline-offset: -1px;
+}
+
+div.top>p{
+	display: inline-block;
+    margin: 0;
+    font-size: calc(var(--w) * .14);
+    line-height: calc(var(--w) * .16);
+}
+
+div.top{
+	font-size: calc(var(--w) * .1);
+    padding: calc(var(--w) * .02);
+}
+
+div.top>button.game-button{
+	float:right;
+}
+
+div#levels{
+	counter-reset: level-num;
+	overflow: auto;
+	width: calc(var(--w) * .9);
+	height: calc(var(--w) * .9);
+	padding: calc(var(--w) * 0.05);
+	scrollbar-width: none;
+}
+
+::-webkit-scrollbar{
+	display:none;
+	width:0px;
+}
+
+button.level{
+	counter-increment : level-num;
+	margin: calc(var(--w) * .04);
+    width: calc(var(--w) * .1);
+    --size: 1.2;
+}
+
+button.level::after{
+	content: counter(level-num);
+}
+.scene.overlay {
+    left: calc(var(--w) * 0.1);
+    top: calc(var(--w) * 0.225);
+    width: calc(var(--w) * 0.8);
+    height: calc(var(--w) * 0.75);
+    background: #fff;
+}
+
+#level-description-text {
+    -webkit-text-fill-color: black;
+    -webkit-text-stroke-width: 0px;
+    font-size: calc(var(--w) * 0.03);
+    white-space: pre-line;
+	
+	display: inline-block;
+    height: calc(var(--w) * 0.35);
+    width: calc(var(--w) * 0.3);
+    position: absolute;
+    top: calc(var(--w) * 0.05);
+    right: calc(var(--w) * 0.05);
+
+	padding: calc(var(--w) * 0.0125);
+}
+
+.game-div{
+	position:absolute;
+	top:0;left:0;
+}
+
+.game-view>div{
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-drag: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	
+	position:absolute;
+	width: 25%;
+	height: 20%;
+	outline-width: 2px;
+
+	transition: left right;
+	transition-duration: .2s;
+	transition-timing-function: ease-in-out;
+}
+
+.game-view>div[data-x="0"]{left:  0%}
+.game-view>div[data-x="1"]{left: 25%}
+.game-view>div[data-x="2"]{left: 50%}
+.game-view>div[data-x="3"]{left: 75%}
+.game-view>div[data-y="0"]{top :  0%}
+.game-view>div[data-y="1"]{top : 20%}
+.game-view>div[data-y="2"]{top : 40%}
+.game-view>div[data-y="3"]{top : 60%}
+.game-view>div[data-y="4"]{top : 80%}
+
+.game-view>div.l-piece[data-y="6"]{top : 120%}
+
+.game-view>div::after{
+	position:absolute;
+	font-size: calc(var(--w) * 0.05);
+	line-height: calc(var(--w) * 0.05);
+	text-align: center;
+	transform: translate(-50%, -50%);
+	top: 50%;
+	left: 50%;
+}
+						   
+.game-view>div.s-piece{
+	background: var(--small-piece-c);
+}
+.game-view>div.s-piece::after{
+	content: "兵";
+}
+.game-view>div.v-piece{
+	background: var(--vertical-piece-c);
+	height: 40%;
+}
+.game-view>div.v-piece::after,
+.game-view>div.h-piece::after{
+	content: "将";
+}
+.game-view>div.h-piece{
+	background: var(--horizontal-piece-c);
+	width: 50%;
+}
+.game-view>div.l-piece{
+	width: 50%;
+	height: 40%;
+	background: var(--large-piece-c);
+}
+.game-view>div.l-piece::after{
+	content: "曹";
+}
+	
+.game-view{		
+	outline-width: 2px;
+}
+	
+div[data-blur="true"]{
+	-webkit-filter: blur(2px);
+	-moz-filter: blur(2px);
+	-o-filter: blur(2px);
+	-ms-filter: blur(2px);
+	filter: blur(2px);
+}
+
+.game-view#level-preview>div {
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke-width: 0;
+}
+
+p#level-description-title{
+    font-size: calc(var(--w) * 0.05);
+    margin: 0;
+    text-align: center;
+    padding: calc(var(--w) * 0.025);
+    line-height: calc(var(--w) * 0.05);
+}
+
+#level-description>div{
+    width: calc(var(--w) * 0.8);
+    height: calc(var(--w) * 0.475);
+    position: relative;
+}
+
+#level-description>button {
+	position:absolute;
+	bottom : calc(var(--w) * .0475);
+    width: 20%;
+}
+
+button#ls-back{
+	left: 15%;
+}
+button#ls-next{
+	right: 15%;
+}
+
+.game-view#level-preview{
+	width: calc(var(--w) * 0.3125);
+    height: calc(var(--w) * 0.375);
+    display: inline-block;
+    position: relative;
+    margin: calc(var(--w) * 0.05);
+}
+
+#game-canvas{
+    position: relative;
+    width: calc(var(--w) * 0.64);
+    height: calc(var(--w) * 0.8);
+    margin: calc(var(--w) * 0.1) calc(var(--w) * 0.16);
+}
+
+#game-hint{
+	margin-right: calc(var(--w) * .02);
+}
+
+#game>#game-top>#info::before{
+	content: "Moves:";
+}
+#game>#game-top>#info{
+	font-size: calc(var(--w) * 0.04);
+    position: absolute;
+    right: calc(var(--w) * 0.02);
+    top: calc(var(--w) * 0.12);
 }

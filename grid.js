@@ -83,16 +83,32 @@ class Grid{
 	fromString(){
 		
 	}
+
+	get isAnimating(){
+		return !this.pieces.every(i=>!i.isAnimating);
+	}
 }
 
 /** @abstract */
 class Piece{
-	/** @param {number} x @param {number} y */
-	constructor(x, y, id){
+	/** @param {number} x @param {number} y @param {HTMLElement} el*/
+	constructor(x, y, el){
+		this.el = el;
 		this.px = this.x = x;
 		this.py = this.y = y;
-		this.id = id;
+		this.isAnimating = false;
+		this.el.ontransitionstart = _=>{
+			this.isAnimating = true;
+		}
+		this.el.ontransitionend = _=>{
+			this.isAnimating = false;
+		}
 	}
+
+	get x(){return +this.el.dataset.x}
+	get y(){return +this.el.dataset.y}
+	set x(v){this.el.dataset.x = v}
+	set y(v){this.el.dataset.y = v}
 
 	/** @abstract @param {Grid} grid */
 	place(grid){}
@@ -101,6 +117,7 @@ class Piece{
 	moveR(){this.px = this.x++; return true}
 	moveT(){this.py = this.y--; return true}
 	moveB(){this.py = this.y++; return true}
+
 
 	_check(grid, x, y, func){
 		return !grid.hasWall(x, y) && (!grid.hasPiece(x, y) || grid.getPiece(x, y)[func](grid));

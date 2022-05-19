@@ -1,41 +1,80 @@
 class Game{
-	constructor(){
+	constructor(el){
+		this.el = el;
+		
 		/** @type {Map<string, Scene>} */
 		this.scenes = new Map();
 
 		/** @type {String} */
 		this.currScene = null;
+		/** @type {String} */
+		this.nextSceneOverride = null;
+		this.nextSceneArgs = {};
 
-		window.addEventListener("keydown",e=>{
-			this.currScene = this.scenes.get(this.currScene)?.events?.keydown?.(e) || this.currScene;
-		})
-		window.addEventListener("keyup",e=>{
-			this.currScene = this.scenes.get(this.currScene)?.events?.keyup?.(e) || this.currScene;
-		})
-		window.addEventListener("keypress",e=>{
-			this.currScene = this.scenes.get(this.currScene)?.events?.keypress?.(e) || this.currScene;
-		})
-		window.addEventListener("mousedown",e=>{
-			this.currScene = this.scenes.get(this.currScene)?.events?.mousedown?.(e) || this.currScene;
-		})
-		window.addEventListener("mouseup",e=>{
-			this.currScene = this.scenes.get(this.currScene)?.events?.mouseup?.(e) || this.currScene;
-		})
-		window.addEventListener("click",e=>{
-			this.currScene = this.scenes.get(this.currScene)?.events?.click?.(e) || this.currScene;
-		})
+		let events = _ => {return this.scenes.get(this.currScene)?.events}
+		
+		let keyDown = e => {this.gotoScene(events()?.keydown?.(e, this.data))}
+		let keyUp = e => {this.gotoScene(events()?.keyup?.(e, this.data))}
+		let keyPress = e => {this.gotoScene(events()?.keypress?.(e, this.data))}
+		let mouseDown = e => {this.gotoScene(events()?.mousedown?.(e, this.data))}
+		let mouseUp = e => {this.gotoScene(events()?.mouseup?.(e, this.data))}
+		let mouseMove = e => {this.gotoScene(events()?.mousemove?.(e, this.data))}
+		let click = e => {
+			let target = e.target;
+			while(target){
+				for(let button of this.scenes.get(this.currScene).ui.buttons){
+					if(target === button.el){
+						button.action((nextScene,args)=>{
+							this._gotoScene(nextScene,args);
+						}, this.data);
+						return;
+					}
+				}
+				target = target.parentElement;
+			}
+			this.gotoScene(events()?.click?.(e))
+		}
+		
+		window.addEventListener("keydown",keyDown);
+		window.addEventListener("keyup",keyUp);
+		window.addEventListener("keypress",keyPress);
+		window.addEventListener("mousedown",mouseDown)
+		window.addEventListener("mouseup",mouseUp);
+		window.addEventListener("mousemove",mouseMove);
+		window.addEventListener("click",click);
+		window.addEventListener("touchstart",e=>mouseDown(e.touches[0]));
+		window.addEventListener("touchmove", e=>mouseMove(e.touches[0]));
+		window.addEventListener("touchend",({changedTouches:[t]})=>(mouseUp(t),click(t)));
 	}
+
+	_gotoScene(nextScene, args){
+		this.nextSceneArgs = args || {};
+		this.gotoScene(nextScene);
+	}
+	
 	/** @param {string} name @param {Scene} scene */
 	addScene(name, scene){
 		this.scenes.set(name, scene);
 	}
 	/** @param {string} name */
-	run(name){
+	run(name, args){
 		this.currScene = name;
+
+		this.data = {};
+		this.scenes.get(name).onstart(this.data, args);
 		const f = ()=>{
 			const scene = this.scenes.get(this.currScene);
-			const next = scene.run();
+			scene.run((nextScene,args)=>{
+				this._gotoScene(nextScene,args);
+			}, this.data);
+
+			let next = this.nextSceneOverride;
+			
+			if(next) this.scenes.get(next).onstart(this.data, this.nextSceneArgs);
+			
 			this.currScene = next || this.currScene;
+			this.nextSceneOverride = null;
+			this.nextSceneArgs = null;
 			if(this.currScene == "QUIT") return;
 			requestAnimationFrame(f);
 		}
@@ -44,7 +83,7 @@ class Game{
 
 	/** @param {String} scene */
 	gotoScene(scene){
-		this.currScene = scene;
+		if(scene) this.nextSceneOverride = scene;
 	}
 }
 
@@ -55,18 +94,48 @@ class Game{
  * 	keypress : 	(e:KeyboardEvent)=>string,
  * 	mousedown : (e:MouseEvent)=>string,
  * 	mouseup : 	(e:MouseEvent)=>string,
- * 	click : 	(e:MouseEvent)=>string
+ * 	click : 	(e:MouseEvent)=>string,
+ * 	mousemove : (e:MouseEvent)=>string
  * }} SceneEventListeners
  */
 /**
  * @typedef {{
+ * 	buttons : UIButton[]
+ * }} SceneUI
+ */
+/**
+ * @typedef {{
  * 	events : SceneEventListeners
+ *  ui : SceneUI
  * }} SceneOptions
  */
 class Scene{
-	/** @param {()=>string} run @param {SceneOptions} options */
-	constructor(run, options){
+	/**
+	 * @param {(data:Object)=>string} run
+	 * @param {SceneOptions} options
+	 * @param {()=>Object} [onstart]
+	 */
+	constructor(run, options, onstart){
 		this.run = run;
-		this.events = options.events;
+		this.onstart = onstart || (_=>{return {}})
+		/** @type {SceneEventListeners} */
+		this.events = options.events || {};
+		/** @type {SceneUI} */
+		this.ui = options.ui || {};
+		this.ui.buttons ||= [];
+	}
+}
+
+/** @typedef {(nextScene:string, args:Object)=>any} GotoSceneFunction */
+
+class UIButton{
+	/**
+	 * @param {HTMLElement} el
+	 * @param {(gotoScene: GotoSceneFunction, data: Object)=>any} action
+	 */
+	constructor(el, action){
+		this.el = el;
+		/** @type {(gotoScene:GotoSceneFunction,data:Object)=>any} */
+		this.action = action || function(){};
 	}
 }

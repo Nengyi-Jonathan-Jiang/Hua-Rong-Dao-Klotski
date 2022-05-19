@@ -179,6 +179,12 @@ class Canvas {
     fillRect(x1, y1, x2, y2) {
         this.ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
     }
+	/**
+     * Clears a rectancle. (x1,y1) is the top left corner and (x2,y2) is the bottom right corner.
+     */
+    clearRect(x1, y1, x2, y2) {
+        this.ctx.clearRect(x1, y1, x2 - x1, y2 - y1);
+    }
     /**
      * Draws a rectancle. (x1,y1) is the top left corner and (x2,y2) is the bottom right corner.
      */
@@ -388,6 +394,54 @@ class Canvas {
         this.ctx.fill();
         this.ctx.closePath();
     }
+
+	/**
+     * Draws a squircle
+     * @param x
+     * x-coordinate of the rectangle center
+     * @param y
+     * y-coordinate of the rectangle center
+     * @param width
+     * width of rounded rectangle
+	 * @param height
+     * width of rounded rectangle
+     * @param r
+     * radius of rounded corners
+     */
+    drawRoundedRectangle(x, y, width, height, r = 5) {
+        this.ctx.beginPath();
+        this.ctx.arc(x + width / 2 - r, y - height / 2 + r, r, 3 * Math.PI / 2, 0 * Math.PI / 2);
+        this.ctx.arc(x + width / 2 - r, y + height / 2 - r, r, 0 * Math.PI / 2, 1 * Math.PI / 2);
+        this.ctx.arc(x - width / 2 + r, y + height / 2 - r, r, 1 * Math.PI / 2, 2 * Math.PI / 2);
+        this.ctx.arc(x - width / 2 + r, y - height / 2 + r, r, 2 * Math.PI / 2, 3 * Math.PI / 2);
+        this.ctx.lineTo(x + width / 2 - r, y - height / 2);
+        this.ctx.stroke();
+        this.ctx.closePath();
+    }
+    /**
+     * Fills a rounded rectangle
+     * @param x
+     * x-coordinate of the rectangle center
+     * @param y
+     * y-coordinate of the rectangle center
+     * @param width
+     * width of rounded rectangle
+	 * @param height
+     * width of rounded rectangle
+     * @param r
+     * radius of rounded corners
+     */
+    fillRoundedRectangle(x, y, width, height, r = 5) {
+        this.ctx.beginPath();
+        this.ctx.arc(x + width / 2 - r, y - height / 2 + r, r, 3 * Math.PI / 2, 0 * Math.PI / 2);
+        this.ctx.arc(x + width / 2 - r, y + height / 2 - r, r, 0 * Math.PI / 2, 1 * Math.PI / 2);
+        this.ctx.arc(x - width / 2 + r, y + height / 2 - r, r, 1 * Math.PI / 2, 2 * Math.PI / 2);
+        this.ctx.arc(x - width / 2 + r, y - height / 2 + r, r, 2 * Math.PI / 2, 3 * Math.PI / 2);
+        this.ctx.lineTo(x + width / 2 - r, y - height / 2);
+        this.ctx.fill();
+        this.ctx.closePath();
+    }
+	
     /**
      * Draws a curve through 2 or more points
      * @param points
@@ -500,6 +554,15 @@ class Canvas {
     translate(x, y) {
         this.ctx.translate(x, y);
     }
+
+	transform(a, b, c, d, e, f){
+		this.ctx.transform(a, b, c, d, e, f);
+	}
+
+	scale(x, y){
+		this.ctx.scale(x, y === undefined ? x : y);
+	}
+	
     /**
      * Calls f(current time,elapsed time in milliseconds) 60 times per second (or tries to...)
      * @param {Function} f-the function to be called
