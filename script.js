@@ -4,7 +4,7 @@ const el_scene_menu = document.getElementById("menu");
 const el_scene_level_select = document.getElementById("level-selection");
 const el_scene_level_description = document.getElementById("level-description");
 const el_scene_game = document.getElementById("game");
-const el_scene_game_menu = document.getElementById("game-menu");
+const el_scene_game_win = document.getElementById("game-win");
 
 const btn_menu_play = document.getElementById("play");
 const btn_menu_settings = document.getElementById("settings");
@@ -16,16 +16,22 @@ const el_level_select_levels = document.getElementById("levels");
 
 const btn_level_description_back = document.getElementById("ls-back");
 const btn_level_description_play = document.getElementById("ls-next");
+const p_level_description_title = document.getElementById("level-description-title");
 
 const el_level_description_game_view = document.getElementById("level-preview");
 const el_game_game_view = document.getElementById("game-canvas");
 
 const span_info = document.getElementById("info");
+const p_game_title = document.getElementById("game-level-title");
 
 const btn_game_hint = document.getElementById("game-hint");
 const btn_game_menu = document.getElementById("game-goto-menu");
-const btn_game_redo = document.getElementById("game-redo");
-const btn_game_undo = document.getElementById("game-undo");
+const btn_game_exit = document.getElementById("game-exit");
+const btn_game_restart = document.getElementById("game-restart");
+const el_game_options = document.getElementById("game-options");
+
+const p_win_moves = document.getElementById("win-moves");
+const p_win_hints = document.getElementById("win-hints");
 
 function hide(el){el.setAttribute("data-hidden", "true");}
 function show(el){el.setAttribute("data-hidden", "false");}
@@ -86,7 +92,7 @@ game.addScene("Menu", new Scene(function(){}, {
 }, function(){
 	hide(el_scene_level_description);
 	hide(el_scene_game);
-	hide(el_scene_game_menu);
+	hide(el_scene_game_win);
 	hide(el_scene_level_select);
 	
 	show(el_scene_menu);
@@ -104,7 +110,6 @@ game.addScene("LevelSelect", new Scene(function(){}, {
 				el_level_select_levels.appendChild(btn);
 				return new UIButton(btn, function(gotoScene, data){
 					data.currLevel = i;
-					level.generate(el_level_description_game_view);
 					gotoScene("LevelDescription");
 				})
 			}),
@@ -114,7 +119,7 @@ game.addScene("LevelSelect", new Scene(function(){}, {
 	hide(el_scene_menu);
 	hide(el_scene_level_description);
 	hide(el_scene_game);
-	hide(el_scene_game_menu);
+	hide(el_scene_game_win);
 	
 	unblur(el_scene_level_select);
 	show(el_scene_level_select);
@@ -136,10 +141,13 @@ game.addScene("LevelDescription", new Scene(function(){}, {
 			}),
 		]
 	}
-}, function(){
+}, function(data){
 	hide(el_scene_menu);
 	hide(el_scene_game);
-	hide(el_scene_game_menu);
+	hide(el_scene_game_win);
+
+	LEVELS[data.currLevel].generate(el_level_description_game_view);
+	p_level_description_title.innerText = LEVELS[data.currLevel].name;
 	
 	blur(el_scene_level_select);
 	show(el_scene_level_select);
@@ -150,7 +158,6 @@ game.addScene("Level", new Scene(function(gotoScene, data){
 	let g = data.gameBoard;
 	if(g.pieces[0].y == 6 && !g.isAnimating) return gotoScene("Win");
 	if(g.pieces[0].x == 1 && g.pieces[0].y == 3 && !g.isAnimating) g.pieces[0].y = 6;
-	
 }, {
 	events: {
 		mousedown : (e, data)=>{
@@ -193,24 +200,46 @@ game.addScene("Level", new Scene(function(gotoScene, data){
 				if(g["moveL|moveT|moveR|moveB".split("|")[angle]](piece.x, piece.y)){
 					info.innerText = ++data.moves;
 				};
-
 			}
 			data.selectedPiece = data.mouseDownX = data.mouseDownY = null;
 		}
+	},
+	ui: {
+		buttons: [
+			new UIButton(btn_game_exit, function(gotoScene, data){
+				gotoScene("LevelSelect");
+			}),
+			new UIButton(btn_game_hint, function(gotoScene, data){
+				let g = data.gameBoard;
+				if(g.isAnimating) return;
+				applyMove(g, hint(g));
+				data.hints++;
+				info.innerText = ++data.moves;
+			}),
+			new UIButton(btn_game_menu, function(){
+				el_game_options.dataset.extended = !(el_game_options.dataset.extended == "true");
+			}),
+			new UIButton(btn_game_restart, function(gotoScene){
+				gotoScene("Level");
+			}),
+		]
 	}
 }, function(data){
 	hide(el_scene_menu);
 	hide(el_scene_level_select);
 	hide(el_scene_level_description);
-	hide(el_scene_game_menu);
+	hide(el_scene_game_win);
 	
-	unblur(el_scene_game);
-	show(el_scene_game);
+	p_game_title.innerText = LEVELS[data.currLevel].name;
+
+	el_game_options.dataset.extended = "false";
 	
 	g = data.gameBoard = LEVELS[data.currLevel].generate(el_game_game_view);
 	info.innerText = data.moves = 0;
 	data.hints = 0;
-	console.log(data);
+	
+	unblur(el_scene_game);
+	show(el_scene_game);
 }));
 
 game.addScene("Win", new Scene(_=>{
@@ -222,6 +251,17 @@ game.addScene("Win", new Scene(_=>{
 			return "LevelSelect";
 		}
 	}
+}, function(data){
+	hide(el_scene_menu);
+	hide(el_scene_level_select);
+	hide(el_scene_level_description);
+	
+	blur(el_scene_game);
+	show(el_scene_game);
+	show(el_scene_game_win);
+
+	p_win_moves.innerText = data.moves;
+	p_win_hints.innerText = data.hints;
 }));
 
 // game.run("Level");

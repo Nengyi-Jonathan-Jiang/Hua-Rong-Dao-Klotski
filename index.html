@@ -8,6 +8,7 @@
 		<script src="Canvas.js"></script>
 		<script src="Games.js"></script>
 		<script src="solver.js"></script>
+		<script src="wasm-solver.js"></script>
         <script src="grid.js"></script>
     </head>
     <body>
@@ -19,9 +20,6 @@
 				<div id="menu-items">
 					<button class="menu-button" id="play">
 						Play
-					</button>
-					<button class="menu-button" id="settings">
-						Settings
 					</button>
 					<button class="menu-button" id="about">
 						About
@@ -52,8 +50,7 @@
 						<div class="s-piece" style="--x:2;--y:3"></div>
 						<div class="s-piece" style="--x:3;--y:4"></div>
 					</div>
-					<div id="level-description-text">
-						Description
+					<div id="level-description-text">Description
 						Lorem ipsum dolor sit
 						amet
 					</div>
@@ -61,20 +58,26 @@
 				<button id="ls-back">Back</button>
 				<button id="ls-next">Play</button>
 			</div>
-			<div class="scene" id="game" data-hidden="false" data-blur="false">
+			<div class="scene" id="game" data-hidden="true" data-blur="false">
 				<div id="game-top" class="top">
 					<p id="game-level-title">Lorem</p>
-					<button class="game-button" id="game-goto-menu">☰</button>
-					<button class="game-button" id="game-hint">?</button>
-                    <button class="game-button" id="game-undo">&lt;</button>
-					<button class="game-button" id="game-redo">&gt;</button>
+					<div id="game-buttons">
+						<button class="game-button" id="game-goto-menu">☰</button>
+						<span id="game-options">
+							<button class="game-button" id="game-exit">X</button>
+							<button class="game-button" id="game-restart">↺</button>
+						</span>
+						<button class="game-button" id="game-hint">?</button>
+					</div>
                     <span id="info"></span>
 				</div>
 				<div class="game-view" id="game-canvas"></div>
 			</div>
-			<div class="scene overlay" id="game-menu" data-hidden="true">
-				<button class="menu-button">✖ Exit</button>
-				<button class="menu-button">↺ Restart</button>
+			<div class="scene overlay" id="game-win" data-hidden="true">
+				<p id="solved-text"> Solved! </p>
+				<p id="win-moves"></p>
+				<p id="win-hints"></p>
+				<p id="win-continue"> Click anywhere to continue </p>
 			</div>
 		</div>
         <script src="puzzles.js"></script>

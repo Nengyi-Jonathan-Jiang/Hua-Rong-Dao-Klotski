@@ -19,6 +19,9 @@ class Game{
 		let mouseDown = e => {this.gotoScene(events()?.mousedown?.(e, this.data))}
 		let mouseUp = e => {this.gotoScene(events()?.mouseup?.(e, this.data))}
 		let mouseMove = e => {this.gotoScene(events()?.mousemove?.(e, this.data))}
+		let _click = e => {
+			this.gotoScene(events()?.click?.(e))
+		}
 		let click = e => {
 			let target = e.target;
 			while(target){
@@ -32,7 +35,7 @@ class Game{
 				}
 				target = target.parentElement;
 			}
-			this.gotoScene(events()?.click?.(e))
+			_click(e);
 		}
 		
 		window.addEventListener("keydown",keyDown);
@@ -44,7 +47,7 @@ class Game{
 		window.addEventListener("click",click);
 		window.addEventListener("touchstart",e=>mouseDown(e.touches[0]));
 		window.addEventListener("touchmove", e=>mouseMove(e.touches[0]));
-		window.addEventListener("touchend",({changedTouches:[t]})=>(mouseUp(t),click(t)));
+		window.addEventListener("touchend",({changedTouches:[t]})=>(mouseUp(t),_click(t)));
 	}
 
 	_gotoScene(nextScene, args){

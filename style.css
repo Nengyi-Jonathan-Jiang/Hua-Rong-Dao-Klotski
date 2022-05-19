@@ -25,6 +25,7 @@ div#container{
     top:  calc((100vh - var(--h)) * 0.5);
     width: var(--w);
 	height: var(--h);
+	overflow: hidden;
 }
 
 div#container>canvas{
@@ -34,8 +35,7 @@ div#container>canvas{
 }
 
 body{
-/* 	--background-c : #5F5449; */
-	--background-c : #FFF;
+	--background-c : #101018;
 	--background-2-c : #a58d73;
 	--small-piece-c : #4D9DE0;
 	--horizontal-piece-c : #E15554;
@@ -72,6 +72,8 @@ div.scene{
 	top:0;left:0;
 	width: var(--w);
 	height : calc(var(--w) * 1.2);
+	outline: 2px solid white;
+	outline-offset: -1px;
 }
 
 button.game-button, button.level{
@@ -89,10 +91,6 @@ button.menu-button{
 	margin: calc(var(--w) * .025) calc(var(--w) * .1);
 }
 
-div#menu-items>button{
-	--size : 1;
-}
-
 .scene[data-hidden="true"]{
 	display:none;
 }
@@ -101,25 +99,23 @@ div.scene#menu{
 	text-align: center;
 }
 
+#menu-items{
+	margin-top: calc(var(--w) * 0.2);
+}
+
 p#menu-title{
 	font-size : calc(var(--w) * .25);
 	margin : calc(var(--w) * .1);
 }
 	
 *{
-	color: black;
-  	-webkit-text-fill-color: white; /* Will override color (regardless of order) */
-  	-webkit-text-stroke-width: 1px;
-  	-webkit-text-stroke-color: black;
+	color: white;
 
 	font-family: Arial;
 	font-weight: bold;
 
 	user-select: none;
 	touch-action:none;
-
-	outline : 1px solid black;
-	outline-offset: -1px;
 }
 
 div.top>p{
@@ -153,6 +149,7 @@ div#levels{
 }
 
 button.level{
+	position:relative;
 	counter-increment : level-num;
 	margin: calc(var(--w) * .04);
     width: calc(var(--w) * .1);
@@ -161,18 +158,23 @@ button.level{
 
 button.level::after{
 	content: counter(level-num);
+	position:absolute;
+	font-size: calc(var(--w) * 0.05);
+	line-height: calc(var(--w) * 0.05);
+	text-align: center;
+	transform: translate(-50%, -50%);
+	top: 50%;
+	left: 50%;
 }
 .scene.overlay {
     left: calc(var(--w) * 0.1);
     top: calc(var(--w) * 0.225);
     width: calc(var(--w) * 0.8);
     height: calc(var(--w) * 0.75);
-    background: #fff;
+    background: var(--background-c);
 }
 
 #level-description-text {
-    -webkit-text-fill-color: black;
-    -webkit-text-stroke-width: 0px;
     font-size: calc(var(--w) * 0.03);
     white-space: pre-line;
 	
@@ -183,7 +185,7 @@ button.level::after{
     top: calc(var(--w) * 0.05);
     right: calc(var(--w) * 0.05);
 
-	padding: calc(var(--w) * 0.0125);
+	padding: 0 calc(var(--w) * 0.0125);
 }
 
 .game-div{
@@ -201,11 +203,18 @@ button.level::after{
 	position:absolute;
 	width: 25%;
 	height: 20%;
-	outline-width: 2px;
 
 	transition: left right;
 	transition-duration: .2s;
 	transition-timing-function: ease-in-out;
+
+	outline : 2px solid white;
+	outline-offset: -1px;
+
+	-webkit-text-stroke-width: 1px;
+  	-webkit-text-stroke-color: black;
+	
+	text-shadow: none;
 }
 
 .game-view>div[data-x="0"]{left:  0%}
@@ -287,6 +296,8 @@ p#level-description-title{
     width: calc(var(--w) * 0.8);
     height: calc(var(--w) * 0.475);
     position: relative;
+	outline: 2px solid white;
+	outline-offset: -1px;
 }
 
 #level-description>button {
@@ -317,8 +328,11 @@ button#ls-next{
     margin: calc(var(--w) * 0.1) calc(var(--w) * 0.16);
 }
 
-#game-hint{
+#game>#game-top>button{
 	margin-right: calc(var(--w) * .02);
+}
+#game>#game-top>#game-goto-menu{
+	margin-right: 0;
 }
 
 #game>#game-top>#info::before{
@@ -329,4 +343,73 @@ button#ls-next{
     position: absolute;
     right: calc(var(--w) * 0.02);
     top: calc(var(--w) * 0.12);
+}
+
+#game-level-title{
+/* 	position:absolute; */
+}
+
+#game-buttons{
+    display: inline-block;
+    position: absolute;
+    right: calc(var(--w) * 0.02);
+    margin-right: calc(var(--w) * -0.02);
+}
+
+#game-buttons button {
+    margin-right: calc(var(--w) * 0.02);
+}
+#game-buttons>*{
+    float: right;
+}
+#game-buttons>game-options{
+	width: calc(var(--w) * 0.1);
+    display: inline-flex;
+    float: right;
+    height: calc(var(--w) * 0.1);
+    overflow: hidden;
+}
+#game-options>button {
+    margin-right: calc(var(--w) * 0.02);
+    display: inline-block;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+#game-options{
+    width: 0;
+    display: inline-flex;
+    float: right;
+    height: calc(var(--w) * 0.1);
+    overflow: hidden;
+	transition: width;
+	transition-duration: .25s;
+	transition-timing-function: ease-in-out;
+}
+#game-options[data-extended="true"]{
+    width: calc(var(--w) * 0.2);
+}
+
+#game-win>p {
+    width: calc(100% - (var(--w) * 0.2));
+    padding: 0 calc(var(--w) * 0.1);
+    font-size: calc(var(--w) * 0.05);
+    margin: calc(var(--w) * 0.05) 0;
+}
+
+#game-win>#solved-text {
+    text-align: center;
+    font-size: calc(var(--w) * 0.1);
+}
+#game-win>#win-continue {
+    text-align: center;
+    font-size: calc(var(--w) * 0.055);
+    padding: 0;
+    width: 100%;
+    margin-top: calc(var(--w) * 0.15);
+}
+#win-moves::before{content: "Moves: "}
+#win-hints::before{content: "Hints: "}
+
+div, p {
+    text-shadow: 0 0 0.5em;
 }

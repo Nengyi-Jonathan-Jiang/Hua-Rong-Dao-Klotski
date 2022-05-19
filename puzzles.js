@@ -40,12 +40,19 @@ class Level{
 }
 
 const LEVELS = [
-	new Level("Tutorial - 0", `
+	new Level("Testing - 1", `
 		@@@@
 		@@@@
 		@12@
 		@34@
 		@__@
+	`),
+	new Level("Testing - 2", `
+		@@@@
+		@@@@
+		@@@@
+		12_@
+		34_@
 	`),
 	new Level("Tutorial - 1", `
 		@12@

@@ -97,9 +97,6 @@ class Piece{
 		this.px = this.x = x;
 		this.py = this.y = y;
 		this.isAnimating = false;
-		this.el.ontransitionstart = _=>{
-			this.isAnimating = true;
-		}
 		this.el.ontransitionend = _=>{
 			this.isAnimating = false;
 		}
@@ -113,10 +110,10 @@ class Piece{
 	/** @abstract @param {Grid} grid */
 	place(grid){}
 
-	moveL(){this.px = this.x--; return true}
-	moveR(){this.px = this.x++; return true}
-	moveT(){this.py = this.y--; return true}
-	moveB(){this.py = this.y++; return true}
+	moveL(){this.px = this.x--; return this.isAnimating = true}
+	moveR(){this.px = this.x++; return this.isAnimating = true}
+	moveT(){this.py = this.y--; return this.isAnimating = true}
+	moveB(){this.py = this.y++; return this.isAnimating = true}
 
 
 	_check(grid, x, y, func){
