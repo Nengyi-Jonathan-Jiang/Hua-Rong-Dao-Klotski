@@ -326,6 +326,8 @@ button#ls-next{
     width: calc(var(--w) * 0.64);
     height: calc(var(--w) * 0.8);
     margin: calc(var(--w) * 0.1) calc(var(--w) * 0.16);
+	outline: calc(var(--w) * 0.06) solid var(--frame-c);
+    outline-offset: 1px;
 }
 
 #game>#game-top>button{
@@ -414,8 +416,20 @@ div, p {
     text-shadow: 0 0 0.5em;
 }
 
+<<<<<<< HEAD
 #how-to-play-text{
 	padding: calc(var(--w) * 0.1);
 	font-size: calc(var(--w) * 0.04);
 	text-align: justify;
+=======
+div#game-canvas:before {
+    position: absolute;
+    content: "";
+    display: block;
+    top: calc(var(--w) * 0.8);
+    left: calc(1px + (var(--w) * 0.16));
+    width: calc(50% - 2px);
+    height: 10%;
+    background: var(--background-c);
+>>>>>>> 2b5dd659f9a1b16685a620c68b591aa5beb0cb92
 }
