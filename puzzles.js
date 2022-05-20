@@ -40,14 +40,14 @@ const LEVELS = [
 		^<>^
 		v@^v
 		_@v_
-	`),
+	`, {moves: 32, difficulty: "Easy"}),
     new Level("井底之蛙",`
 		@<>@
 		^12^
 		v34v
 		@<>@
 		_<>_
-	`),
+	`, {moves: 59, difficulty: "Easy"}),
     new Level("桃花园中",`
 		@12@
 		^23^
