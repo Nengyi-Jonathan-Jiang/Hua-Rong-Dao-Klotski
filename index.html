@@ -10,6 +10,7 @@
 		<script src="solver.js"></script>
 		<script src="wasm-solver.js"></script>
         <script src="grid.js"></script>
+		<script src="levels.js"></script>
     </head>
     <body>
     	<div id="container">
@@ -21,10 +22,19 @@
 					<button class="menu-button" id="play">
 						Play
 					</button>
-					<button class="menu-button" id="about">
-						About
+					<button class="menu-button" id="instructions">
+						How to Play
 					</button>
 				</div>
+			</div>
+			<div class="scene" id="how-to-play" data-hidden="true">
+				<p id="how-to-play-text">
+					华容道 (Huarong Path) is a sliding puzzle invented in the early 20th century.
+					The goal of the game is to move the largest piece (labeled 曹) to the bottom.
+				</p>
+				<button class="menu-button" id="how-to-play-return">
+					Ok, Got It!
+				</button>
 			</div>
 			<div class="scene" id="level-selection" data-hidden="true" data-blur="true">
 				<div id="level-select-top" class="top">
@@ -82,5 +92,5 @@
 		</div>
         <script src="puzzles.js"></script>
         <script src="script.js"></script>
-    
-</body></html>
+	</body>
+</html>

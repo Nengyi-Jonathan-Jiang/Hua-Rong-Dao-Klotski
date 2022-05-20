@@ -1,14 +1,16 @@
 //Get DOM elements
 const el_container = document.getElementById("container");
 const el_scene_menu = document.getElementById("menu");
+const el_scene_how_to_play = document.getElementById("how-to-play");
 const el_scene_level_select = document.getElementById("level-selection");
 const el_scene_level_description = document.getElementById("level-description");
 const el_scene_game = document.getElementById("game");
 const el_scene_game_win = document.getElementById("game-win");
 
 const btn_menu_play = document.getElementById("play");
-const btn_menu_settings = document.getElementById("settings");
-const btn_menu_about = document.getElementById("about");
+const btn_menu_how_to_play = document.getElementById("instructions");
+
+const btn_how_to_play_return = document.getElementById("how-to-play-return");
 
 const btn_level_select_exit = document.getElementById("select-exit");
 
@@ -17,6 +19,7 @@ const el_level_select_levels = document.getElementById("levels");
 const btn_level_description_back = document.getElementById("ls-back");
 const btn_level_description_play = document.getElementById("ls-next");
 const p_level_description_title = document.getElementById("level-description-title");
+const p_level_description_text = document.getElementById("level-description-text");
 
 const el_level_description_game_view = document.getElementById("level-preview");
 const el_game_game_view = document.getElementById("game-canvas");
@@ -78,14 +81,11 @@ let prevX, prevY;
 game.addScene("Menu", new Scene(function(){}, {
 	ui:{
 		buttons: [
-			new UIButton(btn_menu_settings, function(){
-				console.log("settings");
-			}),
-			new UIButton(btn_menu_about, function(){
-				console.log("about");
+			new UIButton(btn_menu_how_to_play, function(gotoScene){
+				gotoScene("Instructions")
 			}),
 			new UIButton(btn_menu_play, function(gotoScene){
-				gotoScene("LevelSelect", null);
+				gotoScene("LevelSelect");
 			}),
 		]
 	}
@@ -94,8 +94,27 @@ game.addScene("Menu", new Scene(function(){}, {
 	hide(el_scene_game);
 	hide(el_scene_game_win);
 	hide(el_scene_level_select);
+	hide(el_scene_how_to_play);
 	
-	show(el_scene_menu);
+	show(el_scene_menu)
+}))
+
+game.addScene("Instructions", new Scene(function(){}, {
+	ui:{
+		buttons: [
+			new UIButton(btn_how_to_play_return, function(gotoScene){
+				gotoScene("Menu");
+			}),
+		]
+	}
+}, function(){
+	hide(el_scene_level_description);
+	hide(el_scene_game);
+	hide(el_scene_game_win);
+	hide(el_scene_level_select);
+	hide(el_scene_menu)
+
+	show(el_scene_how_to_play);
 }))
 
 game.addScene("LevelSelect", new Scene(function(){}, {
@@ -116,7 +135,8 @@ game.addScene("LevelSelect", new Scene(function(){}, {
 		]
 	}
 }, function(){
-	hide(el_scene_menu);
+	hide(el_scene_menu)
+	hide(el_scene_how_to_play);
 	hide(el_scene_level_description);
 	hide(el_scene_game);
 	hide(el_scene_game_win);
@@ -142,13 +162,15 @@ game.addScene("LevelDescription", new Scene(function(){}, {
 		]
 	}
 }, function(data){
-	hide(el_scene_menu);
+	hide(el_scene_menu)
+	hide(el_scene_how_to_play);
 	hide(el_scene_game);
 	hide(el_scene_game_win);
 
 	LEVELS[data.currLevel].generate(el_level_description_game_view);
 	p_level_description_title.innerText = LEVELS[data.currLevel].name;
-	
+	p_level_description_text.innerText = LEVELS[data.currLevel].description;
+
 	blur(el_scene_level_select);
 	show(el_scene_level_select);
 	show(el_scene_level_description);
@@ -172,7 +194,7 @@ game.addScene("Level", new Scene(function(gotoScene, data){
 				let dx = e.clientX - el_game_game_view.getBoundingClientRect().x - data.mouseDownX;
 				let dy = e.clientY - el_game_game_view.getBoundingClientRect().y - data.mouseDownY;
 			
-				if(dx * dx + dy * dy < 5) return;	//Prevent small swipe
+				if(dx * dx + dy * dy <= 2) return;	//Prevent small swipe
 				
 				let angle = (Math.round(Math.atan2(dy, dx) / Math.PI  * 2) + 2) & 3;
 				let piece = data.selectedPiece;
@@ -192,7 +214,7 @@ game.addScene("Level", new Scene(function(gotoScene, data){
 				let dx = e.clientX - el_game_game_view.getBoundingClientRect().x - data.mouseDownX;
 				let dy = e.clientY - el_game_game_view.getBoundingClientRect().y - data.mouseDownY;
 				
-				if(dx * dx + dy * dy < 5) return;	//Prevent small swipe
+				if(dx * dx + dy * dy <= 2) return;	//Prevent small swipe
 
 				let angle = (Math.round(Math.atan2(dy, dx) / Math.PI  * 2) + 2) & 3;
 				let piece = data.selectedPiece;
@@ -225,7 +247,8 @@ game.addScene("Level", new Scene(function(gotoScene, data){
 		]
 	}
 }, function(data){
-	hide(el_scene_menu);
+	hide(el_scene_menu)
+	hide(el_scene_how_to_play);
 	hide(el_scene_level_select);
 	hide(el_scene_level_description);
 	hide(el_scene_game_win);
@@ -252,7 +275,8 @@ game.addScene("Win", new Scene(_=>{
 		}
 	}
 }, function(data){
-	hide(el_scene_menu);
+	hide(el_scene_menu)
+	hide(el_scene_how_to_play);
 	hide(el_scene_level_select);
 	hide(el_scene_level_description);
 	
