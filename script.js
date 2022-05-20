@@ -125,7 +125,7 @@ game.addScene("LevelSelect", new Scene(function(){}, {
 			}),
 			...LEVELS.map((level, i)=>{
 				let btn = document.createElement("button");
-				btn.className = "level";
+				btn.classList.add("level");
 				el_level_select_levels.appendChild(btn);
 				return new UIButton(btn, function(gotoScene, data){
 					data.currLevel = i;
@@ -194,8 +194,6 @@ game.addScene("Level", new Scene(function(gotoScene, data){
 				let dx = e.clientX - el_game_game_view.getBoundingClientRect().x - data.mouseDownX;
 				let dy = e.clientY - el_game_game_view.getBoundingClientRect().y - data.mouseDownY;
 			
-				if(dx * dx + dy * dy <= 2) return;	//Prevent small swipe
-				
 				let angle = (Math.round(Math.atan2(dy, dx) / Math.PI  * 2) + 2) & 3;
 				let piece = data.selectedPiece;
 			
@@ -214,7 +212,7 @@ game.addScene("Level", new Scene(function(gotoScene, data){
 				let dx = e.clientX - el_game_game_view.getBoundingClientRect().x - data.mouseDownX;
 				let dy = e.clientY - el_game_game_view.getBoundingClientRect().y - data.mouseDownY;
 				
-				if(dx * dx + dy * dy <= 2) return;	//Prevent small swipe
+				if(dx * dx + dy * dy <= 1) return;	//Prevent small swipe
 
 				let angle = (Math.round(Math.atan2(dy, dx) / Math.PI  * 2) + 2) & 3;
 				let piece = data.selectedPiece;

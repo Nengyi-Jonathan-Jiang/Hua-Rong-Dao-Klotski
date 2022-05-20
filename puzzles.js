@@ -1,18 +1,4 @@
 const LEVELS = [
-	new Level("Testing - 1", `
-		@@@@
-		@@@@
-		@12@
-		@34@
-		@__@
-	`),
-	new Level("Testing - 2", `
-		@@@@
-		@@@@
-		@@@@
-		12_@
-		34_@
-	`),
 	new Level("T1", `
 		@12@
 		@34@
@@ -61,21 +47,21 @@ const LEVELS = [
 		^<>^
 		v@@v
 		@__@
-	`),
+	`, {}),
 	new Level("水泄不通",`
 		^12@
 		v34@
 		<><>
 		<><>
 		@__@
-	`),
+	`, {}),
     new Level("峰回路转",`
 		@@@^
 		12^v
 		34v^
 		_<>v
 		_@<>
-	`),
+	`, {}),
 	new Level("指挥若定",`
 		^12^
 		v34v
@@ -125,14 +111,11 @@ const LEVELS = [
 		vvv@
 		_<>_
 	`),
-	new Level("Puzzler",`
+	new Level("六将挡路",`
 		12<>
 		34<>
 		@@__
 		^^<>
 		vv<>
-	`, {
-		difficulty: "Medium",
-		moves: 29
-	}),
+	`, {difficulty: "Medium", moves: 29}),
 ]
