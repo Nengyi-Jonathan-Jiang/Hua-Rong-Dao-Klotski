@@ -192,7 +192,6 @@ const LEVELS = (`
 	<><>
 	@__@
 	Hard 79
-
 	`
 	.trim()
 	.split('\n\n')

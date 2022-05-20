@@ -2,8 +2,10 @@ class Level{
 	constructor(name, layout, description){
 		this.name = name;
 		this.s = layout.trim().split('\n').map(i=>i.trim()).join('');
-		this.description = `Difficulty: ${description?.difficulty || "Unknown"}\nMoves: ${description?.moves || "Unknown"}`;
+		this.difficulty = description.difficulty || "Unknown";
+		this.moves = description.moves || "Unknown";
 	}
+	get description(){return `Difficulty: ${this.difficulty}\nMoves: ${this.moves}`}
 	generate(el){
 		while(el.children.length){
 			el.removeChild(el.children[0]);

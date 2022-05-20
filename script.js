@@ -126,6 +126,7 @@ game.addScene("LevelSelect", new Scene(function(){}, {
 			...LEVELS.map((level, i)=>{
 				let btn = document.createElement("button");
 				btn.classList.add("level");
+				btn.classList.add("diff-"+level.difficulty);
 				el_level_select_levels.appendChild(btn);
 				return new UIButton(btn, function(gotoScene, data){
 					data.currLevel = i;
