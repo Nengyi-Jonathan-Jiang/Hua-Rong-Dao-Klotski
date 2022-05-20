@@ -51,7 +51,6 @@ button{
 	--size: 1;
 	--scaled-w : calc(var(--w) * var(--size));
 	border:none;
-	outline: 1px solid black;
 	font-size : calc(var(--scaled-w) * 0.05);
 	padding: calc(var(--scaled-w) * 0.015);
 	line-height: 1;
@@ -61,6 +60,8 @@ button{
 	
 	background : #8888;
 	transition : background 0.15s;
+	
+	box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #8888;
 }
 
 button:hover{
