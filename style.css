@@ -192,9 +192,12 @@ button.level::after{
 	padding: 0 calc(var(--w) * 0.0125);
 }
 
-.game-div{
+.game-view{
 	position:absolute;
 	top:0;left:0;
+	--s : 0;
+	width: calc(var(--s) * 4);
+	height: calc(var(--s) * 5);
 }
 
 .game-view>div{
@@ -205,8 +208,8 @@ button.level::after{
 	-ms-user-select: none;
 	
 	position:absolute;
-	width: 25%;
-	height: 20%;
+	width: calc(var(--width) * var(--s));
+	height: calc(var(--height) * var(--s));
 
 	transition: left right;
 	transition-duration: .2s;
@@ -219,9 +222,18 @@ button.level::after{
   	-webkit-text-stroke-color: black;
 	
 	text-shadow: none;
+
+	--x : 0;
+	--y : 0;
+	--width: 1;
+	--height: 1;
+
+	/* left: calc(var(--x) * 25%); */
+	/* top:  calc(var(--y) * 20%); */
+	transform: translate(calc(var(--x) * var(--s)), calc(var(--y) * var(--s)));
 }
 
-.game-view>div[data-x="0"]{left:  0%}
+/* .game-view>div[data-x="0"]{left:  0%}
 .game-view>div[data-x="1"]{left: 25%}
 .game-view>div[data-x="2"]{left: 50%}
 .game-view>div[data-x="3"]{left: 75%}
@@ -229,7 +241,16 @@ button.level::after{
 .game-view>div[data-y="1"]{top : 20%}
 .game-view>div[data-y="2"]{top : 40%}
 .game-view>div[data-y="3"]{top : 60%}
-.game-view>div[data-y="4"]{top : 80%}
+.game-view>div[data-y="4"]{top : 80%} */
+.game-view>div[data-x="0"]{--x : 0}
+.game-view>div[data-x="1"]{--x : 1}
+.game-view>div[data-x="2"]{--x : 2}
+.game-view>div[data-x="3"]{--x : 3}
+.game-view>div[data-y="0"]{--y : 0}
+.game-view>div[data-y="1"]{--y : 1}
+.game-view>div[data-y="2"]{--y : 2}
+.game-view>div[data-y="3"]{--y : 3}
+.game-view>div[data-y="4"]{--y : 4}
 
 .game-view>div.l-piece[data-y="6"]{top : 120%}
 
@@ -251,7 +272,7 @@ button.level::after{
 }
 .game-view>div.v-piece{
 	background: var(--vertical-piece-c);
-	height: 40%;
+	--height: 2;
 }
 .game-view>div.v-piece::after,
 .game-view>div.h-piece::after{
@@ -259,19 +280,15 @@ button.level::after{
 }
 .game-view>div.h-piece{
 	background: var(--horizontal-piece-c);
-	width: 50%;
+	--width: 2;
 }
 .game-view>div.l-piece{
-	width: 50%;
-	height: 40%;
+	--width: 2;
+	--height: 2;
 	background: var(--large-piece-c);
 }
 .game-view>div.l-piece::after{
 	content: "曹";
-}
-	
-.game-view{		
-	outline-width: 2px;
 }
 	
 div[data-blur="true"]{
@@ -318,20 +335,17 @@ button#ls-next{
 }
 
 .game-view#level-preview{
-	width: calc(var(--w) * 0.3125);
-    height: calc(var(--w) * 0.375);
     display: inline-block;
     position: relative;
     margin: calc(var(--w) * 0.05);
+	--s : calc(var(--w) * 0.078125);
 }
 
 #game-canvas{
 	position: relative;
-	width: calc(var(--w) * 0.64);
-	height: calc(var(--w) * 0.8);
 	margin: calc(var(--w) * 0.1) calc(var(--w) * 0.18);
 	outline: calc(var(--w) * 0.06) solid var(--frame-c);
-	outline-offset: 1px;
+	--s : calc(var(--w) * 0.16);
 }
 
 #game>#game-top>button{
