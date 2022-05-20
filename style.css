@@ -85,7 +85,11 @@ button.game-button, button.level{
 }
 
 button.level{
-	margin: calc(var(--w) * .04);
+	position: relative;
+    counter-increment: level-num;
+    margin: calc(var(--w) * .0375);
+    width: calc(var(--w) * .15);
+    --size: 1.8;
 }
 	
 button.menu-button{
@@ -150,14 +154,6 @@ div#levels{
 ::-webkit-scrollbar{
 	display:none;
 	width:0px;
-}
-
-button.level{
-	position:relative;
-	counter-increment : level-num;
-	margin: calc(var(--w) * .04);
-    width: calc(var(--w) * .1);
-    --size: 1.2;
 }
 
 button.level::after{
