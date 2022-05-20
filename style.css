@@ -432,14 +432,14 @@ div#game-canvas:before {
 	background: var(--background-c);
 }
 
-button.level.diff-Tutorial {background-color: #48f8; box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #48f8}
-button.level.diff-Easy	{background-color: #4f48; box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #4f48}
-button.level.diff-Medium	{background-color: #ff48; box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #ff48}
-button.level.diff-Hard	{background-color: #f448; box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #f448}
-button.level.diff-Crazy	{background-color: #84f8; box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #84f8}
+button.level.diff-Tutorial 		 {background-color: #48f8; box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #48f8}
+button.level.diff-Easy			 {background-color: #4f48; box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #4f48}
+button.level.diff-Medium		 {background-color: #fc3c; box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #fc3c}
+button.level.diff-Hard			 {background-color: #f448; box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #f448}
+button.level.diff-Crazy			 {background-color: #84f8; box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #84f8}
 
 button.level.diff-Tutorial:hover {background-color: #36b8}
-button.level.diff-Easy:hover	{background-color: #3b38}
-button.level.diff-Medium:hover	{background-color: #bb38}
-button.level.diff-Hard:hover	{background-color: #b338}
-button.level.diff-Crazy:hover	{background-color: #63b8}
+button.level.diff-Easy:hover	 {background-color: #3b38}
+button.level.diff-Medium:hover	 {background-color: #b92c}
+button.level.diff-Hard:hover	 {background-color: #b338}
+button.level.diff-Crazy:hover	 {background-color: #63b8}
