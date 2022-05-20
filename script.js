@@ -189,40 +189,45 @@ game.addScene("Level", new Scene(function(gotoScene, data){
 			data.mouseDownY = e.clientY - el_game_game_view.getBoundingClientRect().y;
 		},
 		mousemove : (e, data) => {
-			if(data.selectedPiece){
-				if(data.gameBoard.isAnimating) return;
+			let {selectedPiece, mouseDownX, mouseDownY, gameBoard} = data;
 
-				let dx = e.clientX - el_game_game_view.getBoundingClientRect().x - data.mouseDownX;
-				let dy = e.clientY - el_game_game_view.getBoundingClientRect().y - data.mouseDownY;
-			
+			let mx = e.clientX - el_game_game_view.getBoundingClientRect().x;
+			let my = e.clientY - el_game_game_view.getBoundingClientRect().y;
+
+			data.mouseDownX = mx;
+			data.mouseDownY = my;
+
+			if(selectedPiece){
+				if(gameBoard.isAnimating) return;
+
+				let dx = mx - mouseDownX;
+				let dy = my - mouseDownY;
+				
 				let angle = (Math.round(Math.atan2(dy, dx) / Math.PI  * 2) + 2) & 3;
-				let piece = data.selectedPiece;
 			
-				if(piece.isAnimating) return;
+				if(!g[["moveL","moveT","moveR","moveB"][angle]](selectedPiece.x, selectedPiece.y)) return;
 
-				if(g["moveL|moveT|moveR|moveB".split("|")[angle]](piece.x, piece.y)){
-					info.innerText = ++data.moves;
-				}
+				info.innerText = ++data.moves;
 			}
-			data.selectedPiece = data.mouseDownX = data.mouseDownY = null;
 		},
 		mouseup : (e, data) => {
-			if(data.selectedPiece){
-				if(data.gameBoard.isAnimating) return;
+			let {selectedPiece, mouseDownX, mouseDownY, gameBoard} = data;
+			data.selectedPiece = data.mouseDownX = data.mouseDownY = null;
 
-				let dx = e.clientX - el_game_game_view.getBoundingClientRect().x - data.mouseDownX;
-				let dy = e.clientY - el_game_game_view.getBoundingClientRect().y - data.mouseDownY;
+			if(selectedPiece){
+				if(gameBoard.isAnimating) return;
+
+				let dx = e.clientX - el_game_game_view.getBoundingClientRect().x - mouseDownX;
+				let dy = e.clientY - el_game_game_view.getBoundingClientRect().y - mouseDownY;
 				
 				if(dx * dx + dy * dy <= 1) return;	//Prevent small swipe
 
 				let angle = (Math.round(Math.atan2(dy, dx) / Math.PI  * 2) + 2) & 3;
-				let piece = data.selectedPiece;
 			
-				if(g["moveL|moveT|moveR|moveB".split("|")[angle]](piece.x, piece.y)){
-					info.innerText = ++data.moves;
-				};
+				if(!g[["moveL","moveT","moveR","moveB"][angle]](selectedPiece.x, selectedPiece.y)) return;
+				
+				info.innerText = ++data.moves;
 			}
-			data.selectedPiece = data.mouseDownX = data.mouseDownY = null;
 		}
 	},
 	ui: {
