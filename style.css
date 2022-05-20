@@ -416,12 +416,12 @@ div, p {
     text-shadow: 0 0 0.5em;
 }
 
-<<<<<<< HEAD
 #how-to-play-text{
 	padding: calc(var(--w) * 0.1);
 	font-size: calc(var(--w) * 0.04);
 	text-align: justify;
-=======
+}
+
 div#game-canvas:before {
     position: absolute;
     content: "";
@@ -431,5 +431,4 @@ div#game-canvas:before {
     width: calc(50% - 2px);
     height: 10%;
     background: var(--background-c);
->>>>>>> 2b5dd659f9a1b16685a620c68b591aa5beb0cb92
 }
