@@ -104,16 +104,16 @@ class Piece{
 
 	get x(){return +this.el.dataset.x}
 	get y(){return +this.el.dataset.y}
-	set x(v){this.el.dataset.x = v}
-	set y(v){this.el.dataset.y = v}
+	set x(v){this.el.dataset.x = v; this.isAnimating = true}
+	set y(v){this.el.dataset.y = v; this.isAnimating = true}
 
 	/** @abstract @param {Grid} grid */
 	place(grid){}
 
-	moveL(){this.px = this.x--; return this.isAnimating = true}
-	moveR(){this.px = this.x++; return this.isAnimating = true}
-	moveT(){this.py = this.y--; return this.isAnimating = true}
-	moveB(){this.py = this.y++; return this.isAnimating = true}
+	moveL(){this.px = this.x--; return true}
+	moveR(){this.px = this.x++; return true}
+	moveT(){this.py = this.y--; return true}
+	moveB(){this.py = this.y++; return true}
 
 
 	_check(grid, x, y, func){
