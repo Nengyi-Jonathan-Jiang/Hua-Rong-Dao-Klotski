@@ -11,8 +11,8 @@ body{
 
 	overflow: hidden;
 	
-    position: absolute;
-    top: 0; left: 0;
+	position: absolute;
+	top: 0; left: 0;
 	width: 100vw;
 	height: 100vh;
 	margin: 0;
@@ -41,7 +41,7 @@ body{
 	--horizontal-piece-c : #E15554;
 	--vertical-piece-c : #FFC43D;
 	--large-piece-c : #3BB273;
-	--frame-c : #F2E2D2;
+	--frame-c : #FFF;
 	
 	background-color : var(--background-c);
 }
@@ -322,12 +322,12 @@ button#ls-next{
 }
 
 #game-canvas{
-    position: relative;
-    width: calc(var(--w) * 0.64);
-    height: calc(var(--w) * 0.8);
-    margin: calc(var(--w) * 0.1) calc(var(--w) * 0.16);
+	position: relative;
+	width: calc(var(--w) * 0.64);
+	height: calc(var(--w) * 0.8);
+	margin: calc(var(--w) * 0.1) calc(var(--w) * 0.18);
 	outline: calc(var(--w) * 0.06) solid var(--frame-c);
-    outline-offset: 1px;
+	outline-offset: 1px;
 }
 
 #game>#game-top>button{
