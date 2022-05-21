@@ -29,7 +29,7 @@ const LEVELS = (`
 	<><>
 	<><>
 	_<>_
-	Easy 34
+	Easy 25
 	
 	五将逼宫
 	<><>
@@ -37,7 +37,7 @@ const LEVELS = (`
 	v34v
 	@<>@
 	@__@
-	Easy 38
+	Easy 34
 
 	一路顺风
 	^12@
@@ -45,7 +45,7 @@ const LEVELS = (`
 	^<>^
 	v@^v
 	_@v_
-	Easy 39
+	Easy 32
 
 	堵塞要道
 	@12@
