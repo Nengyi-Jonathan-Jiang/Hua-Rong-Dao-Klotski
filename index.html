@@ -14,7 +14,7 @@
     </head>
     <body>
     	<div id="container">
-			<div class="scene" id="menu" data-hidden="true">
+			<div class="scene glow" id="menu" data-hidden="true">
 				<p id="menu-title">
 					华容道
 				</p>
@@ -27,7 +27,7 @@
 					</button>
 				</div>
 			</div>
-			<div class="scene" id="how-to-play" data-hidden="true">
+			<div class="scene glow" id="how-to-play" data-hidden="true">
 				<p id="how-to-play-text">
 					华容道 (Huarong Path) is a sliding puzzle invented in the early 20th century.
 					The goal of the game is to move the largest piece (labeled 曹) to the bottom.
@@ -40,15 +40,15 @@
 				</button>
 			</div>
 			<div class="scene" id="level-selection" data-hidden="true" data-blur="true">
-				<div id="level-select-top" class="top">
+				<div id="level-select-top" class="top glow inner-border">
 					<p id="level-select-title">
 						华容道
 					</p>
 					<button class="game-button" id="select-exit">X</button>
 				</div>
-				<div id="levels"></div>
+				<div id="levels" class="glow inner-border"></div>
 			</div>
-			<div class="scene overlay" id="level-description" data-hidden="true">
+			<div class="scene overlay glow" id="level-description" data-hidden="true">
 				<p id="level-description-title">Level ???</p>
 				<div>
 					<div class="game-view" id="level-preview">
@@ -69,7 +69,7 @@
 				<button id="ls-next">Play</button>
 			</div>
 			<div class="scene" id="game" data-hidden="true" data-blur="false">
-				<div id="game-top" class="top">
+				<div id="game-top" class="top glow inner-border">
 					<p id="game-level-title">Lorem</p>
 					<div id="game-buttons">
 						<button class="game-button" id="game-goto-menu">☰</button>
@@ -81,9 +81,11 @@
 					</div>
                     <span id="info"></span>
 				</div>
-				<div class="game-view" id="game-canvas"></div>
+				<div id="game-container" class="glow inner-border">
+					<div class="game-view" id="game-canvas"></div>
+				</div>
 			</div>
-			<div class="scene overlay" id="game-win" data-hidden="true">
+			<div class="scene overlay glow" id="game-win" data-hidden="true">
 				<p id="solved-text"> Solved! </p>
 				<p id="win-moves"></p>
 				<p id="win-hints"></p>

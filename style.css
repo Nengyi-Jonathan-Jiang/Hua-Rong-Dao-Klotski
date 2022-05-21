@@ -72,9 +72,21 @@ div.scene{
 	height : calc(var(--w) * 1.2);
 	outline: 2px solid white;
 	outline-offset: -2px;
-	box-shadow: inset 0 0 calc(var(--w) * 0.025) white;
 }
 
+.glow{
+	box-shadow: inset 0 0 calc(var(--w) * 0.025) white;
+}
+.inner-border{
+	outline: 1px solid white;
+	outline-offset: -1px;
+}
+
+#game-container{
+	width: var(--w);
+    height: var(--w);
+    position: absolute;
+}
 
 button.game-button, button.level{
 	display:inline-block;

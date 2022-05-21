@@ -23,6 +23,14 @@ const LEVELS = (`
 	v__v
 	Tutorial 14
 
+	一夫当关
+	@@@@
+	@@@@
+	@@@@
+	<>12
+	__34
+	Tutorial 27
+
 	巧过五关
 	@12@
 	@34@
@@ -38,7 +46,7 @@ const LEVELS = (`
 	@<>@
 	@__@
 	Easy 34
-
+	
 	一路顺风
 	^12@
 	v34@
@@ -63,6 +71,14 @@ const LEVELS = (`
 	@__@
 	Medium 65
 
+	六将挡路
+	12<>
+	34<>
+	@@__
+	^^<>
+	vv<>
+	Medium 1
+
 	井底之蛙
 	@<>@
 	^12^
@@ -79,14 +95,6 @@ const LEVELS = (`
 	_<>_
 	Medium 70
 
-	水泄不通
-	^12@
-	v34@
-	<><>
-	<><>
-	@__@
-	Medium 79
-
 	插翅难飞
 	^12@
 	v34@
@@ -94,6 +102,14 @@ const LEVELS = (`
 	^<>^
 	v__v
 	Hard 62
+
+	水泄不通
+	^12@
+	v34@
+	<><>
+	<><>
+	@__@
+	Hard 79
 
 	横刀立马
 	^12^
@@ -103,14 +119,6 @@ const LEVELS = (`
 	@__@
 	Hard 81
 
-	守口如瓶
-	@12@
-	^34^
-	v^_v
-	@v_@
-	<><>
-	Hard 99
-
 	横马当关
 	^12^
 	v34v
@@ -118,6 +126,14 @@ const LEVELS = (`
 	@^ @
 	@v @
 	Hard 83
+
+	守口如瓶
+	@12@
+	^34^
+	v^_v
+	@v_@
+	<><>
+	Crazy 99
 
 	层层设防
 	@12@
@@ -136,6 +152,7 @@ const LEVELS = (`
 	Crazy 138
 	`
 	.trim()
+	.replace(/\n[ \t]+/g,"\n")
 	.split('\n\n')
 	.map(i=>i.split('\n').map(j=>j.trim()))
 	.map(i=>new Level(
