@@ -29,7 +29,7 @@ const LEVELS = (`
 	@@@@
 	<>12
 	__34
-	Tutorial 27
+	Tutorial 25
 
 	巧过五关
 	@12@
