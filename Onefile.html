@@ -1,0 +1,2402 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <title>华容道（Klotski）</title>
+        <style>body{
+	--padding : 20px;
+
+	
+	--d: min((100vw - 20px) * 1.2, (100vh - 20px));
+	--w: calc(var(--d) * 0.8333333333);
+	--h: calc(var(--d) * 1.0);
+
+	overflow: hidden;
+	
+	position: absolute;
+	top: 0; left: 0;
+	width: 100vw;
+	height: 100vh;
+	margin: 0;
+	padding: 0;
+}
+
+div#container{
+	position:absolute;
+	left: calc((100vw - var(--w)) * 0.5);
+	top:	calc((100vh - var(--h)) * 0.5);
+	width: var(--w);
+	height: var(--h);
+	overflow: hidden;
+}
+
+div#container>canvas{
+	width: 100%;
+	height: 100%;
+	touch-action: none;
+}
+
+body{
+	--background-c : #101018;
+	--background-2-c : #a58d73;
+	--small-piece-c : #4D9DE0;
+	--horizontal-piece-c : #E15554;
+	--vertical-piece-c : #FFC43D;
+	--large-piece-c : #3BB273;
+	--frame-c : #FFF;
+	
+	background-color : var(--background-c);
+}
+
+
+button{
+	--size: 1;
+	--scaled-w : calc(var(--w) * var(--size));
+	border:none;
+	font-size : calc(var(--scaled-w) * 0.05);
+	padding: calc(var(--scaled-w) * 0.015);
+	line-height: 1;
+	height: calc(var(--scaled-w) * .08);
+	border-radius : calc(var(--scaled-w) * 0.025);
+	text-align: center;
+	
+	background : #8888;
+	transition : background 0.25s;
+	
+	box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #8888;
+}
+
+button:hover{
+	background : #4448;
+}
+
+div.scene{
+	position:absolute;
+	top:0;left:0;
+	width: var(--w);
+	height : calc(var(--w) * 1.2);
+	outline: 2px solid white;
+	outline-offset: -2px;
+}
+
+.glow{
+	box-shadow: inset 0 0 calc(var(--w) * 0.025) white;
+}
+.inner-border{
+	outline: 1px solid white;
+	outline-offset: -1px;
+}
+
+#game-container{
+	width: var(--w);
+    height: var(--w);
+    position: absolute;
+}
+
+button.game-button, button.level{
+	display:inline-block;
+	width: calc(var(--w) * .08);
+}
+
+button.level{
+	position: relative;
+	counter-increment: level-num;
+	margin: calc(var(--w) * .0375);
+	width: calc(var(--w) * .15);
+	--size: 1.8;
+}
+	
+button.menu-button{
+	display:block;
+	width: calc(var(--w) * .8);
+	margin: calc(var(--w) * .025) calc(var(--w) * .1);
+}
+
+.scene[data-hidden="true"]{
+	display:none;
+}
+
+div.scene#menu{
+	text-align: center;
+}
+
+#menu-items{
+	margin-top: calc(var(--w) * 0.2);
+}
+
+p#menu-title{
+	font-size : calc(var(--w) * .25);
+	margin : calc(var(--w) * .1);
+}
+	
+*{
+	color: white;
+
+	font-family: Arial;
+	font-weight: bold;
+
+	user-select: none;
+	touch-action:none;
+}
+
+div.top>p{
+	display: inline-block;
+	margin: 0;
+	font-size: calc(var(--w) * .14);
+	line-height: calc(var(--w) * .16);
+}
+
+div.top{
+	font-size: calc(var(--w) * .1);
+	padding: calc(var(--w) * .02);
+}
+
+div.top>button.game-button{
+	float:right;
+}
+
+div#levels{
+	counter-reset: level-num;
+	overflow: auto;
+	width: calc(var(--w) * .9);
+	height: calc(var(--w) * .9);
+	padding: calc(var(--w) * 0.05);
+	scrollbar-width: none;
+	touch-action: pan-y;
+}
+
+::-webkit-scrollbar{
+	display:none;
+	width:0px;
+}
+
+button.level::after{
+	content: counter(level-num);
+	position:absolute;
+	font-size: calc(var(--w) * 0.05);
+	line-height: calc(var(--w) * 0.05);
+	text-align: center;
+	transform: translate(-50%, -50%);
+	top: 50%;
+	left: 50%;
+}
+.scene.overlay {
+	left: calc(var(--w) * 0.1);
+	top: calc(var(--w) * 0.225);
+	width: calc(var(--w) * 0.8);
+	height: calc(var(--w) * 0.75);
+	background: var(--background-c);
+}
+
+#level-description-text {
+	font-size: calc(var(--w) * 0.03);
+	white-space: pre-line;
+	
+	display: inline-block;
+	height: calc(var(--w) * 0.35);
+	width: calc(var(--w) * 0.3);
+	position: absolute;
+	top: calc(var(--w) * 0.05);
+	right: calc(var(--w) * 0.05);
+
+	padding: 0 calc(var(--w) * 0.0125);
+}
+
+.game-view{
+	position:absolute;
+	top:0;left:0;
+	--s : 0;
+	width: calc(var(--s) * 4);
+	height: calc(var(--s) * 5);
+}
+
+.game-view>div{
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-drag: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	
+	position:absolute;
+	width: calc(var(--width) * var(--s));
+	height: calc(var(--height) * var(--s));
+
+	transition: left right;
+	transition-duration: .2s;
+	transition-timing-function: ease-in-out;
+
+	outline : 2px solid white;
+	outline-offset: -1px;
+
+	-webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: black;
+	
+	text-shadow: none;
+
+	--x : 0;
+	--y : 0;
+	--width: 1;
+	--height: 1;
+
+	transform: translate(calc(var(--x) * var(--s)), calc(var(--y) * var(--s)));
+}
+
+.game-view>div[data-x="0"]{--x : 0}
+.game-view>div[data-x="1"]{--x : 1}
+.game-view>div[data-x="2"]{--x : 2}
+.game-view>div[data-x="3"]{--x : 3}
+.game-view>div[data-y="0"]{--y : 0}
+.game-view>div[data-y="1"]{--y : 1}
+.game-view>div[data-y="2"]{--y : 2}
+.game-view>div[data-y="3"]{--y : 3}
+.game-view>div[data-y="4"]{--y : 4}
+.game-view>div.l-piece[data-y="6"]{--y : 6}
+
+.game-view>div::after{
+	position:absolute;
+	font-size: calc(var(--w) * 0.05);
+	line-height: calc(var(--w) * 0.05);
+	text-align: center;
+	transform: translate(-50%, -50%);
+	top: 50%;
+	left: 50%;
+}
+
+.game-view>div.s-piece{
+	background: var(--small-piece-c);
+}
+.game-view>div.s-piece::after{
+	content: "兵";
+}
+.game-view>div.v-piece{
+	background: var(--vertical-piece-c);
+	--height: 2;
+}
+.game-view>div.v-piece::after,
+.game-view>div.h-piece::after{
+	content: "将";
+}
+.game-view>div.h-piece{
+	background: var(--horizontal-piece-c);
+	--width: 2;
+}
+.game-view>div.l-piece{
+	--width: 2;
+	--height: 2;
+	background: var(--large-piece-c);
+}
+.game-view>div.l-piece::after{
+	content: "曹";
+}
+	
+div[data-blur="true"]{
+	-webkit-filter: blur(2px);
+	-moz-filter: blur(2px);
+	-o-filter: blur(2px);
+	-ms-filter: blur(2px);
+	filter: blur(2px);
+}
+
+.game-view#level-preview>div {
+	color: transparent;
+	-webkit-text-fill-color: transparent;
+	-webkit-text-stroke-width: 0;
+}
+
+p#level-description-title{
+	font-size: calc(var(--w) * 0.05);
+	margin: 0;
+	text-align: center;
+	padding: calc(var(--w) * 0.025);
+	line-height: calc(var(--w) * 0.05);
+}
+
+#level-description>div{
+	width: calc(var(--w) * 0.8);
+	height: calc(var(--w) * 0.475);
+	position: relative;
+	outline: 2px solid white;
+	outline-offset: -2px;
+}
+
+#level-description>button {
+	position:absolute;
+	bottom : calc(var(--w) * .0475);
+	width: 20%;
+}
+
+button#ls-back{
+	left: 15%;
+}
+button#ls-next{
+	right: 15%;
+}
+
+.game-view#level-preview{
+	display: inline-block;
+	position: relative;
+	margin: calc(var(--w) * 0.05);
+	--s : calc(var(--w) * 0.078125);
+}
+
+#game-canvas{
+	position: relative;
+	margin: calc(var(--w) * 0.1) calc(var(--w) * 0.18);
+	outline: calc(var(--w) * 0.06) solid var(--frame-c);
+	--s : calc(var(--w) * 0.16);
+}
+
+#game>#game-top>button{
+	margin-right: calc(var(--w) * .02);
+}
+#game>#game-top>#game-goto-menu{
+	margin-right: 0;
+}
+
+#game>#game-top>#info::before{
+	content: "Moves:";
+}
+#game>#game-top>#info{
+	font-size: calc(var(--w) * 0.04);
+	position: absolute;
+	right: calc(var(--w) * 0.02);
+	top: calc(var(--w) * 0.12);
+}
+
+#game-buttons{
+	display: inline-block;
+	position: absolute;
+	right: calc(var(--w) * 0.02);
+	margin-right: calc(var(--w) * -0.02);
+}
+
+#game-buttons button {
+	margin-right: calc(var(--w) * 0.02);
+}
+#game-buttons>*{
+	float: right;
+}
+#game-buttons>game-options{
+	width: calc(var(--w) * 0.1);
+	display: inline-flex;
+	float: right;
+	height: calc(var(--w) * 0.1);
+	overflow: hidden;
+}
+#game-options>button {
+	margin-right: calc(var(--w) * 0.02);
+	display: inline-block;
+	flex-grow: 0;
+	flex-shrink: 0;
+}
+#game-options{
+	width: 0;
+	display: inline-flex;
+	float: right;
+	height: calc(var(--w) * 0.1);
+	overflow: hidden;
+	transition: width;
+	transition-duration: .25s;
+	transition-timing-function: ease-in-out;
+}
+#game-options[data-extended="true"]{
+	width: calc(var(--w) * 0.2);
+	padding-left: calc(var(--w) * 0.025);
+	margin-left: calc(var(--w) * -0.025);
+	padding-top: calc(var(--w) * 0.025);
+	margin-top: calc(var(--w) * -0.025);
+}
+
+#game-win>p {
+	width: calc(100% - (var(--w) * 0.2));
+	padding: 0 calc(var(--w) * 0.1);
+	font-size: calc(var(--w) * 0.05);
+	margin: calc(var(--w) * 0.05) 0;
+}
+
+#game-win>#solved-text {
+	text-align: center;
+	font-size: calc(var(--w) * 0.1);
+}
+#game-win>#win-continue {
+	text-align: center;
+	font-size: calc(var(--w) * 0.055);
+	padding: 0;
+	width: 100%;
+	margin-top: calc(var(--w) * 0.15);
+}
+#win-moves::before{content: "Moves: "}
+#win-hints::before{content: "Hints: "}
+
+div, p {
+	text-shadow: 0 0 0.5em;
+}
+
+#how-to-play-text{
+	padding: calc(var(--w) * 0.1);
+	font-size: calc(var(--w) * 0.04);
+	text-align: justify;
+}
+
+div#game-canvas:before {
+	position: absolute;
+	content: "";
+	display: block;
+	top: calc(var(--w) * 0.8);
+	left: calc(1px + (var(--w) * 0.16));
+	width: calc(50% - 2px);
+	height: 10%;
+	background: var(--background-c);
+}
+
+button.level.diff-Tutorial 		 {background-color: #48f8; box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #48f8}
+button.level.diff-Easy			 {background-color: #4f48; box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #4f48}
+button.level.diff-Medium		 {background-color: #fc3c; box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #fc3c}
+button.level.diff-Hard			 {background-color: #f448; box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #f448}
+button.level.diff-Crazy			 {background-color: #84f8; box-shadow: 0 0 calc(var(--scaled-w) * 0.025) #84f8}
+
+button.level.diff-Tutorial:hover {background-color: #36b8}
+button.level.diff-Easy:hover	 {background-color: #3b38}
+button.level.diff-Medium:hover	 {background-color: #b92c}
+button.level.diff-Hard:hover	 {background-color: #b338}
+button.level.diff-Crazy:hover	 {background-color: #63b8}
+    </style>
+		<script>"use strict";
+class Canvas {
+    /**
+     * @param width
+     * Width of canvas in pixels. Defaults to window width.
+     * @param height
+     * Height of canvas in pixels. Defaults to window height.
+     * @param parent
+     * If parent is an HTML element,(like div or body),the created HTMLCanvasElement will be appended to it.
+     * @param transparent
+     * If true (default),the created canvas will be able to draw transparent/translucent colors or images.
+     */
+    constructor(width, height, parent, transparent = true, antialias = true) {
+        this.canvas = document.createElement('canvas');
+        this.w = this.canvas.width = width || window.innerWidth;
+        this.h = this.canvas.height = height || window.innerHeight;
+        if (parent && parent.appendChild)
+            parent.appendChild(this.canvas);
+        /** @type {CanvasRenderingContext2D} */
+        this.ctx = this.canvas.getContext('2d', {
+            alpha: transparent,
+			antialias: antialias
+        }) || (_ => { throw Error("Unable to create canvas rendering context"); })();
+        this.ctx.textAlign = "center";
+        this.parent = parent;
+        this.textOptions = {
+            "font-style": "normal",
+            "font-variant": "normal",
+            "font-weight": "normal",
+            "font-size": "12em",
+            "line-height": "1",
+            "font-family": "system-ui"
+        };
+    }
+    set width(width) {
+        this.resize(width, this.h);
+    }
+    get width() {
+        return this.w;
+    }
+    set height(height) {
+        this.resize(this.w, height);
+    }
+    get height() {
+        return this.h;
+    }
+    /**
+     * Resizes the canvas to the provided dimensions,or the size provided by the CSS attributes.
+     * @param width
+     * Width in pixels. If not truthy,will be the the width specified by CSS.
+     * @param height
+     * Height in pixels. If not truthy,will be the the height specified by CSS.
+     */
+    resize(width, height) {
+        this.canvas.width = this.w = width || this.canvas.clientWidth;
+        this.canvas.height = this.h = height || this.canvas.clientHeight;
+    }
+    /**
+     * Resizes the canvas to the dimensions of the parent element (Will probably throw error if the parent provided in the constructor was not a HTMLElement)
+     */
+    resizeToParent() {
+        if (!this.parent)
+            return;
+        this.resize(this.parent.clientWidth, this.parent.clientHeight);
+    }
+    /**
+     * resizes the canvas to the dimensions of the window
+     */
+    resizeToWindow() {
+        this.resize(window.innerWidth, window.innerHeight);
+    }
+    /**
+     * Sets the stroke and fill color of subsequent operations
+     * @param color
+     * Hex value of the color (like #d4c00b)
+     */
+    setDrawColor(color) {
+        this.ctx.strokeStyle = this.ctx.fillStyle = color;
+    }
+    /**
+     * Sets the stroke color of subsequent operations
+     * @param color
+     * Hex value of the color (like #d4c00b)
+     */
+    setStrokeColor(color) {
+        this.ctx.strokeStyle = color;
+    }
+    /**
+     * Sets the fill color of subsequent operations
+     * @param {string} color
+     * Hex value of the color (like #d4c00b)
+     */
+    setFillColor(color) {
+        this.ctx.fillStyle = color;
+    }
+    /**
+     * Sets the stroke width of subsequent operations
+     * @param {number} width
+     * Stroke width in pixels
+     */
+    setStrokeWidth(width) {
+        this.ctx.lineWidth = width;
+    }
+    /**
+     * Wrapper for ctx.beginPath.
+     */
+    beginPath() {
+        this.ctx.beginPath();
+    }
+    /**
+     * Wrapper for ctx.moveTo.
+     * Moves to (x,y). This starts a new line/fill
+     */
+    moveTo(x, y) {
+        this.ctx.moveTo(x, y);
+    }
+    /**
+     * Wrapper for ctx.lineTo
+     * Makes a line to (x,y)
+     */
+    lineTo(x, y) {
+        this.ctx.lineTo(x, y);
+    }
+    /**
+     * Wrapper for ctx.arc
+     * Draws an arc centered at (x,y) from a1 to a2 full turns clockwise with radius
+     * r. If counterclockwise=true,the arc will be inverted (not mirrored)
+     */
+    arc(x, y, r, a1, a2, counterclockwise = false) {
+        this.ctx.arc(x, y, r, a1 * 2 * Math.PI, a2 * 2 * Math.PI, counterclockwise);
+    }
+    /**
+     * Wrapper for ctx.stroke
+     * Draws the path onto the canvas
+     */
+    stroke() {
+        this.ctx.stroke();
+    }
+    /**
+     * Wrapper for ctx.fill
+     * Fills in the area outlined in the path
+     */
+    fill() {
+        this.ctx.fill();
+    }
+    /**
+     * Wrapper for ctx.closePath
+     */
+    closePath() {
+        this.ctx.closePath();
+    }
+    /**
+     * Clears canvas. If color is provided,fill canvas with color
+     * @param color
+     * Hex value of the color (like #d4c00b). If not provided,the resulting canvas is transparent if transparency is enabled or white otherwise.
+     */
+    clear(color) {
+        this.ctx.save();
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        if (color)
+            this.setFillColor(color), this.ctx.fillRect(0, 0, this.w, this.h);
+        else
+            this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        this.ctx.restore();
+    }
+    /**
+     * Draws a line from x1 to y1.
+     */
+    line(x1, y1, x2, y2) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(x1, y1);
+        this.ctx.lineTo(x2, y2);
+        this.ctx.stroke();
+        this.ctx.closePath();
+    }
+    /**
+     * Fills a rectancle with color. (x1,y1) is the top left corner and (x2,y2) is the bottom right corner.
+     */
+    fillRect(x1, y1, x2, y2) {
+        this.ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+    }
+	/**
+     * Clears a rectancle. (x1,y1) is the top left corner and (x2,y2) is the bottom right corner.
+     */
+    clearRect(x1, y1, x2, y2) {
+        this.ctx.clearRect(x1, y1, x2 - x1, y2 - y1);
+    }
+    /**
+     * Draws a rectancle. (x1,y1) is the top left corner and (x2,y2) is the bottom right corner.
+     */
+    drawRect(x1, y1, x2, y2) {
+        this.ctx.beginPath();
+        this.ctx.rect(x1, y1, x2 - x1, y2 - y1);
+        this.ctx.stroke();
+        this.ctx.closePath();
+    }
+    /**
+     * Fills a square with top left corner at (x1,y1) and width
+     */
+    fillSquare(x, y, width) {
+        this.ctx.fillRect(x, y, width, width);
+    }
+    /**
+     * Draws a square with top left corner at (x,y) and width
+     */
+    drawSquare(x, y, width) {
+        this.ctx.beginPath();
+        this.ctx.rect(x, y, width, width);
+        this.ctx.stroke();
+        this.ctx.closePath();
+    }
+    /**
+     * Fills a circle with center (x,y) and radius r
+     */
+    fillCircle(x, y, r) {
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, r, 0, 2 * Math.PI);
+        this.ctx.fill();
+        this.ctx.closePath();
+    }
+    /**
+     * Draws a circle with center (x,y) and radius r
+     */
+    drawCircle(x, y, r) {
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, r - this.ctx.lineWidth / 2, 0, 2 * Math.PI);
+        this.ctx.stroke();
+        this.ctx.closePath();
+    }
+    /**
+     * Fills an arc centered at (x,y) from a1 to a2 full turns clockwise with radius
+     * r. If counterclockwise=true,the arc will be inverted (not mirrored)
+     */
+    fillArc(x, y, r, a1, a2, counterclockwise = false) {
+        this.beginPath();
+        this.moveTo(x, y);
+        this.arc(x, y, r, a1, a2);
+        this.fill();
+        this.closePath();
+    }
+    /**
+     * Draws an arc centered at (x,y) from a1 to a2 full turns clockwise with radius
+     * r. If counterclockwise=true,the arc will be inverted (not mirrored)
+     */
+    drawArc(x, y, r, a1, a2, counterclockwise = false) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(x, y);
+        this.ctx.arc(x, y, r, a1 * 2 * Math.PI, a2 * 2 * Math.PI, counterclockwise);
+        this.ctx.stroke();
+        this.ctx.closePath();
+    }
+    /**
+     * Fills an double arc centered at (x,y) from a1 to a2 full turns clockwise with radii
+     * r1 and r2. If counterclockwise=true,the arc will be inverted (not mirrored)
+     */
+    fillDoubleArc(x, y, r1, r2, a1, a2, counterclockwise = false) {
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, r1, a1 * 2 * Math.PI, a2 * 2 * Math.PI);
+        this.ctx.arc(x, y, r2, a2 * 2 * Math.PI, a1 * 2 * Math.PI, counterclockwise);
+        this.ctx.fill();
+        this.ctx.closePath();
+    }
+
+    /** @param {String} family */
+    setFontFamily(family){
+        this.textOptions["font-family"] = family;
+    }
+    /** @param {"italic"|"normal"} style */
+    setFontStyle(style){
+        this.textOptions["font-style"] = style;
+    }
+    /** @param {"bolder"|"bold"|"normal"|"lighter"} weight */
+    setFontWeight(weight){
+        this.textOptions["font-weight"] = weight;
+    }
+    /** @param {number} height */
+    setLineHeight(height){
+        this.textOptions = height.toString();
+    }
+    /** @param {"normal"|"small_caps"} variant */
+    setFontVariant(variant){
+        this.textOptions["font-variant"] = variant;
+    }
+    /** @param {"center"|"end"|"left"|"right"|"start"} align */
+    setTextAlign(align){
+        this.ctx.textAlign = align;
+    }
+    /** @param {"alphabetic" | "bottom" | "hanging" | "ideographic" | "middle" | "top"} baseline */
+    setTextBaseline(baseline){
+        this.ctx.textBaseline = baseline;
+    }
+
+    /**
+     * Fill text with top left corner at (x,y)
+     * @param txt
+     * The text to display
+     * @param size
+     * The font size in pixels
+     * @param  font
+     * A string parsed like a CSS font property (like "italic bold 16px Times";)
+     */
+    fillText(txt, x, y, size) {
+        this.ctx.beginPath();
+        this.ctx.font = [this.textOptions["font-variant"], this.textOptions["font-weight"], size + "px", this.textOptions["font-family"]].join(" ");
+        this.ctx.textAlign = "center";
+        this.ctx.fillText(txt, x, y);
+        this.ctx.closePath();
+    }
+    /**
+     * Outline text with top left corner at (x,y)
+     * @param txt
+     * The text to display
+     * @param size
+     * The font size in pixels
+     * @param font
+     * A string parsed like a CSS font property (like "italic bold 16px Times";)
+     */
+    drawText(txt, x, y, size) {
+        this.ctx.beginPath();
+        this.ctx.font = [this.textOptions["font-variant"], this.textOptions["font-weight"], size + "px", this.textOptions["font-family"]].join(" ");
+        this.ctx.textAlign = "center";
+        this.ctx.strokeText(txt, x, y);
+        this.ctx.closePath();
+    }
+    /**
+     * draws a polygon centered at center
+     * @param center
+     * center of polygon
+     * @param points
+     * verticies of polygon
+     */
+    drawPolygon(center, points) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(points[points.length - 1][0] + center[0], points[points.length - 1][1] + center[1]);
+        let t = this;
+        points.forEach(s => t.ctx.lineTo(s[0] + center[0], s[1] + center[1]));
+        this.ctx.stroke();
+        this.ctx.closePath();
+    }
+    /**
+     * fills a polygon centered at center
+     * @param center
+     * center of polygon
+     * @param points
+     * verticies of polygon
+     */
+    fillPolygon(center, points) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(points[points.length - 1][0] + center[0], points[points.length - 1][1] + center[1]);
+        let t = this;
+        points.forEach(s => t.ctx.lineTo(s[0] + center[0], s[1] + center[1]));
+        this.ctx.fill();
+        this.ctx.closePath();
+    }
+    /**
+     * Draws a squircle
+     * @param x
+     * x-coordinate of the squircle center
+     * @param y
+     * y-coordinate of the squircle center
+     * @param width
+     * width of squircle
+     * @param r
+     * radius of rounded corners
+     */
+    drawSquircle(x, y, width, r = 5) {
+        this.ctx.beginPath();
+        this.ctx.arc(x + width / 2 - r, y - width / 2 + r, r, 3 * Math.PI / 2, 0 * Math.PI / 2);
+        this.ctx.arc(x + width / 2 - r, y + width / 2 - r, r, 0 * Math.PI / 2, 1 * Math.PI / 2);
+        this.ctx.arc(x - width / 2 + r, y + width / 2 - r, r, 1 * Math.PI / 2, 2 * Math.PI / 2);
+        this.ctx.arc(x - width / 2 + r, y - width / 2 + r, r, 2 * Math.PI / 2, 3 * Math.PI / 2);
+        this.ctx.lineTo(x + width / 2 - r, y - width / 2);
+        this.ctx.stroke();
+        this.ctx.closePath();
+    }
+    /**
+     * Fills a squircle
+     * @param x
+     * x-coordinate of the squircle center
+     * @param y
+     * y-coordinate of the squircle center
+     * @param width
+     * width of squircle
+     * @param r
+     * radius of rounded corners
+     */
+    fillSquircle(x, y, width, r = 5) {
+        this.ctx.beginPath();
+        this.ctx.arc(x + width / 2 - r, y - width / 2 + r, r, 3 * Math.PI / 2, 0 * Math.PI / 2);
+        this.ctx.arc(x + width / 2 - r, y + width / 2 - r, r, 0 * Math.PI / 2, 1 * Math.PI / 2);
+        this.ctx.arc(x - width / 2 + r, y + width / 2 - r, r, 1 * Math.PI / 2, 2 * Math.PI / 2);
+        this.ctx.arc(x - width / 2 + r, y - width / 2 + r, r, 2 * Math.PI / 2, 3 * Math.PI / 2);
+        this.ctx.lineTo(x + width / 2 - r, y - width / 2);
+        this.ctx.fill();
+        this.ctx.closePath();
+    }
+
+	/**
+     * Draws a squircle
+     * @param x
+     * x-coordinate of the rectangle center
+     * @param y
+     * y-coordinate of the rectangle center
+     * @param width
+     * width of rounded rectangle
+	 * @param height
+     * width of rounded rectangle
+     * @param r
+     * radius of rounded corners
+     */
+    drawRoundedRectangle(x, y, width, height, r = 5) {
+        this.ctx.beginPath();
+        this.ctx.arc(x + width / 2 - r, y - height / 2 + r, r, 3 * Math.PI / 2, 0 * Math.PI / 2);
+        this.ctx.arc(x + width / 2 - r, y + height / 2 - r, r, 0 * Math.PI / 2, 1 * Math.PI / 2);
+        this.ctx.arc(x - width / 2 + r, y + height / 2 - r, r, 1 * Math.PI / 2, 2 * Math.PI / 2);
+        this.ctx.arc(x - width / 2 + r, y - height / 2 + r, r, 2 * Math.PI / 2, 3 * Math.PI / 2);
+        this.ctx.lineTo(x + width / 2 - r, y - height / 2);
+        this.ctx.stroke();
+        this.ctx.closePath();
+    }
+    /**
+     * Fills a rounded rectangle
+     * @param x
+     * x-coordinate of the rectangle center
+     * @param y
+     * y-coordinate of the rectangle center
+     * @param width
+     * width of rounded rectangle
+	 * @param height
+     * width of rounded rectangle
+     * @param r
+     * radius of rounded corners
+     */
+    fillRoundedRectangle(x, y, width, height, r = 5) {
+        this.ctx.beginPath();
+        this.ctx.arc(x + width / 2 - r, y - height / 2 + r, r, 3 * Math.PI / 2, 0 * Math.PI / 2);
+        this.ctx.arc(x + width / 2 - r, y + height / 2 - r, r, 0 * Math.PI / 2, 1 * Math.PI / 2);
+        this.ctx.arc(x - width / 2 + r, y + height / 2 - r, r, 1 * Math.PI / 2, 2 * Math.PI / 2);
+        this.ctx.arc(x - width / 2 + r, y - height / 2 + r, r, 2 * Math.PI / 2, 3 * Math.PI / 2);
+        this.ctx.lineTo(x + width / 2 - r, y - height / 2);
+        this.ctx.fill();
+        this.ctx.closePath();
+    }
+	
+    /**
+     * Draws a curve through 2 or more points
+     * @param points
+     * points to draw the curve through
+     */
+    spline(points) {
+        const f = 0.3, t = 0.6;
+        this.ctx.beginPath();
+        this.ctx.moveTo(points[0][0], points[0][1]);
+        let m = 0, dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
+        let preP = points[0], curP, nexP;
+        for (let i = 1; i < points.length; i++) {
+            curP = points[i];
+            nexP = points[i + 1];
+            if (nexP) {
+                m = (preP[1] - curP[1]) / (preP[0] - curP[0]);
+                dx2 = -(nexP[0] - curP[0]) * f;
+                dy2 = dx2 * m * t;
+            }
+            this.ctx.bezierCurveTo(preP[0] - dx1, preP[1] - dy1, curP[0] + dx2, curP[1] + dy2, curP[0], curP[1]);
+            dx1 = dx2;
+            dy1 = dy2;
+            preP = curP;
+        }
+        this.ctx.stroke();
+        this.ctx.closePath();
+    }
+    /**
+     * Draws a bezier curve with 3 control points
+     * @param p1
+     * first control point
+     * @param p2
+     * second control point
+     * @param p3
+     * third control point
+     */
+    bezier(p1, p2, p3) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(...p1);
+        this.ctx.quadraticCurveTo(p2[0], p2[1], p3[0], p3[1]);
+        this.ctx.stroke();
+        this.ctx.closePath();
+    }
+    /**
+     * Draws unscaled image with top left corner at (x,y)
+     */
+    drawImage(img, x, y) {
+        if (img.width * img.height == 0) {
+            console.log(img);
+        }
+        this.ctx.drawImage(img, x, y);
+    }
+    /**
+     * Draws an image scaled by a factor with top left corner at (x,y)
+     */
+    drawScaledImage(img, x, y, factor = 1) {
+        this.ctx.drawImage(img, x, y, factor * img.width, factor * img.height);
+    }
+    /**
+     * Draws an image scaled to width (preserving the aspect ratio) with top left corner at (x,y)
+     */
+    drawImageWithWidth(img, x, y, destwidth) {
+        let destheight = destwidth / img.width * img.height;
+        this.ctx.drawImage(img, x, y, destwidth, destheight);
+    }
+    /**
+     * Draws an image scaled to height (preserving the aspect ratio) with top left corner at (x,y)
+     */
+    drawImageWithHeight(img, x, y, destheight) {
+        let destwidth = destheight / img.height * img.width;
+        this.ctx.drawImage(img, x, y, destwidth, destheight);
+    }
+    /**
+     * Draws an image on a rect with top left corner (x1,y1) and bottom right corner (x2,y2)
+     */
+    drawImageOnRect(img, x1, y1, x2, y2) {
+        let destwidth = x2 - x1;
+        let destheight = y2 - y1;
+        this.ctx.drawImage(img, x1, y1, destwidth, destheight);
+    }
+    /**
+     * Wrapper for CanvasRenderingContext2D.save()
+     * Saves the current state to a stack
+     */
+    pushState() {
+        this.ctx.save();
+    }
+    /**
+     * Wrapper for CanvasRenderingContext2D.restore()
+     * Restores the last state on the stack and pops it from the stack
+     */
+    restoreState() {
+        this.ctx.restore();
+    }
+    /**
+     * rotate context by angle around (x,y) or (0,0) if not present
+     * @param angle
+     * angle in radians
+     * @param clockwise
+     * whether to rotate clockwise
+     */
+    rotate(angle, clockwise = true, x = 0, y = 0) {
+        this.ctx.translate(-x, -y);
+        this.ctx.rotate(clockwise ? angle : -angle);
+        this.ctx.translate(x, y);
+    }
+    /**
+     * translates context x units left and y units down
+     */
+    translate(x, y) {
+        this.ctx.translate(x, y);
+    }
+
+	transform(a, b, c, d, e, f){
+		this.ctx.transform(a, b, c, d, e, f);
+	}
+
+	scale(x, y){
+		this.ctx.scale(x, y === undefined ? x : y);
+	}
+	
+    /**
+     * Calls f(current time,elapsed time in milliseconds) 60 times per second (or tries to...)
+     * @param {Function} f-the function to be called
+     */
+    static createAnimation(f) {
+        return new Promise(resolve => {
+            let then = 0;
+            const f2 = (t) => {
+                if (f(0.001 * t, 0.001 * (then - t)))
+                    resolve(undefined);
+                then = t;
+                requestAnimationFrame(f2);
+            };
+            requestAnimationFrame(f2);
+        });
+    }
+}
+    
+class Game{
+	constructor(el){
+		this.el = el;
+		
+		/** @type {Map<string, Scene>} */
+		this.scenes = new Map();
+
+		/** @type {String} */
+		this.currScene = null;
+		/** @type {String} */
+		this.nextSceneOverride = null;
+		this.nextSceneArgs = {};
+
+		let events = _ => {return this.scenes.get(this.currScene)?.events}
+		
+		let keyDown = e => {this.gotoScene(events()?.keydown?.(e, this.data))}
+		let keyUp = e => {this.gotoScene(events()?.keyup?.(e, this.data))}
+		let keyPress = e => {this.gotoScene(events()?.keypress?.(e, this.data))}
+		let mouseDown = e => {this.gotoScene(events()?.mousedown?.(e, this.data))}
+		let mouseUp = e => {this.gotoScene(events()?.mouseup?.(e, this.data))}
+		let mouseMove = e => {this.gotoScene(events()?.mousemove?.(e, this.data))}
+		let _click = e => {
+			this.gotoScene(events()?.click?.(e))
+		}
+		let click = e => {
+			let target = e.target;
+			while(target){
+				for(let button of this.scenes.get(this.currScene).ui.buttons){
+					if(target === button.el){
+						button.action((nextScene,args)=>{
+							this._gotoScene(nextScene,args);
+						}, this.data);
+						return;
+					}
+				}
+				target = target.parentElement;
+			}
+			_click(e);
+		}
+		
+		window.addEventListener("keydown",keyDown);
+		window.addEventListener("keyup",keyUp);
+		window.addEventListener("keypress",keyPress);
+		window.addEventListener("mousedown",mouseDown)
+		window.addEventListener("mouseup",mouseUp);
+		window.addEventListener("mousemove",mouseMove);
+		window.addEventListener("click",click);
+		window.addEventListener("touchstart",e=>mouseDown(e.touches[0]));
+		window.addEventListener("touchmove", e=>mouseMove(e.touches[0]));
+		window.addEventListener("touchend",({changedTouches:[t]})=>(mouseUp(t),_click(t)));
+	}
+
+	_gotoScene(nextScene, args){
+		this.nextSceneArgs = args || {};
+		this.gotoScene(nextScene);
+	}
+	
+	/** @param {string} name @param {Scene} scene */
+	addScene(name, scene){
+		this.scenes.set(name, scene);
+	}
+	/** @param {string} name */
+	run(name, args){
+		this.currScene = name;
+
+		this.data = {};
+		this.scenes.get(name).onstart(this.data, args);
+		const f = ()=>{
+			const scene = this.scenes.get(this.currScene);
+			scene.run((nextScene,args)=>{
+				this._gotoScene(nextScene,args);
+			}, this.data);
+
+			let next = this.nextSceneOverride;
+			
+			if(next) this.scenes.get(next).onstart(this.data, this.nextSceneArgs);
+			
+			this.currScene = next || this.currScene;
+			this.nextSceneOverride = null;
+			this.nextSceneArgs = null;
+			if(this.currScene == "QUIT") return;
+			requestAnimationFrame(f);
+		}
+		requestAnimationFrame(f);
+	}
+
+	/** @param {String} scene */
+	gotoScene(scene){
+		if(scene) this.nextSceneOverride = scene;
+	}
+}
+
+/**
+ * @typedef {{
+ * 	keydown : 	(e:KeyboardEvent)=>string,
+ * 	keyup : 	(e:KeyboardEvent)=>string,
+ * 	keypress : 	(e:KeyboardEvent)=>string,
+ * 	mousedown : (e:MouseEvent)=>string,
+ * 	mouseup : 	(e:MouseEvent)=>string,
+ * 	click : 	(e:MouseEvent)=>string,
+ * 	mousemove : (e:MouseEvent)=>string
+ * }} SceneEventListeners
+ */
+/**
+ * @typedef {{
+ * 	buttons : UIButton[]
+ * }} SceneUI
+ */
+/**
+ * @typedef {{
+ * 	events : SceneEventListeners
+ *  ui : SceneUI
+ * }} SceneOptions
+ */
+class Scene{
+	/**
+	 * @param {(data:Object)=>string} run
+	 * @param {SceneOptions} options
+	 * @param {()=>Object} [onstart]
+	 */
+	constructor(run, options, onstart){
+		this.run = run;
+		this.onstart = onstart || (_=>{return {}})
+		/** @type {SceneEventListeners} */
+		this.events = options.events || {};
+		/** @type {SceneUI} */
+		this.ui = options.ui || {};
+		this.ui.buttons ||= [];
+	}
+}
+
+/** @typedef {(nextScene:string, args:Object)=>any} GotoSceneFunction */
+
+class UIButton{
+	/**
+	 * @param {HTMLElement} el
+	 * @param {(gotoScene: GotoSceneFunction, data: Object)=>any} action
+	 */
+	constructor(el, action){
+		this.el = el;
+		/** @type {(gotoScene:GotoSceneFunction,data:Object)=>any} */
+		this.action = action || function(){};
+	}
+}
+      var Solver = (function(){
+	/** @typedef {string} state */
+
+	//These dont care that much about performance
+
+	/** @param {string} str */
+	function fromString(str){return str.trim().split('\n').join('')}
+	/** @param {string[][]} mat */
+	function fromMat(mat){return mat.map(i=>i.join('')).join('')}
+
+
+	/** @param {state} mat @param {number} x @param {number} y */
+	function getAt(mat,x, y){
+		return mat[x + y * 4]
+	}
+	/** @param {state} mat @param {number} x @param {number} y @param {string} c */
+	function setAt(mat,x, y, c){
+		let i = x + y * 4;
+		return mat.substring(0,i)
+			+ c
+			+ mat.substring(i+1)
+	}
+
+	/** @param {state} mat @returns {[number, number, string][]} */
+	function allowedMoves(mat){
+		let res = [];
+		for(let x = 0; x <= 3; x++) for(let y = 0; y <= 4; y++){
+			if(getAt(mat, x, y) != '.') continue;
+
+			if(y > 0 && (
+				getAt(mat, x, y - 1) == '@'
+				|| getAt(mat, x, y - 1) == 'v'
+				|| x < 3 && getAt(mat, x, y - 1) == '<' && getAt(mat, x + 1, y - 1) == '>' && getAt(mat, x + 1, y) == '.'
+				|| x < 3 && getAt(mat, x, y - 1) + getAt(mat, x + 1, y - 1) == '34' && getAt(mat, x + 1, y) == '.'
+			)) res.push([x, y - 1, "DOWN"]);
+
+			if(y < 4 && (
+				getAt(mat, x, y + 1) == '@'
+				|| getAt(mat, x, y + 1) == '^'
+				|| x < 3 && getAt(mat, x, y + 1) == '<' && getAt(mat, x + 1, y + 1) == '>' && getAt(mat, x + 1, y) == '.'
+				|| x < 3 && getAt(mat, x, y + 1) + getAt(mat, x + 1, y + 1) == '12' && getAt(mat, x + 1, y) == '.'
+			)) res.push([x, y + 1, "UP"]);
+
+			if(x > 0 && (
+				getAt(mat, x - 1, y) == '@'
+				|| getAt(mat, x - 1, y) == '>'
+				|| y < 4 && getAt(mat, x - 1, y) == '^' && getAt(mat, x - 1, y + 1) == 'v' && getAt(mat, x, y + 1) == '.'
+				|| y < 4 && getAt(mat, x - 1, y) + getAt(mat, x - 1, y + 1) == '24' && getAt(mat, x, y + 1) == '.'
+			)) res.push([x - 1, y, "RIGHT"]);
+
+			if(x < 3 && (
+				getAt(mat, x + 1, y) == '@'
+				|| getAt(mat, x + 1, y) == '<'
+				|| y < 4 && getAt(mat, x + 1, y) == '^' && getAt(mat, x + 1, y + 1) == 'v' && getAt(mat, x, y + 1) == '.'
+				|| y < 4 && getAt(mat, x + 1, y) + getAt(mat, x + 1, y + 1) == '13' && getAt(mat, x, y + 1) == '.'
+			)) res.push([x + 1, y, "LEFT"]);
+		}
+
+		return res;
+	}
+	/** @param {state} mat @param {[number, number, string]} mv @returns {state}*/
+	function move(mat, mv){
+		let [x, y, direction] = mv;
+		switch(getAt(mat, x, y)){
+			case '@':
+				switch(direction){
+					case 'UP':
+						mat = setAt(mat, x, y - 1, '@');
+						mat = setAt(mat, x, y, '.');
+						break;
+					case 'DOWN':
+						mat = setAt(mat, x, y + 1, '@');
+						mat = setAt(mat, x, y, '.');
+						break;
+					case 'LEFT':
+						mat = setAt(mat, x - 1, y, '@');
+						mat = setAt(mat, x, y, '.');
+						break;
+					case 'RIGHT':
+						mat = setAt(mat, x + 1, y, '@');
+						mat = setAt(mat, x, y, '.');
+						break;
+				}
+				break;
+			case '>':
+				switch(direction){
+					case 'RIGHT':
+						mat = setAt(mat, x + 1, y, '>');
+						mat = setAt(mat, x, y, '<');
+						mat = setAt(mat, x - 1, y, '.');
+						break;
+				}
+				break;
+			case '<':
+				switch(direction){
+					case 'UP':
+						mat = setAt(mat, x, y - 1, '<');
+						mat = setAt(mat, x + 1, y - 1, '>');
+						mat = setAt(mat, x, y, '.');
+						mat = setAt(mat, x + 1, y, '.');
+						break;
+					case 'DOWN':
+						mat = setAt(mat, x, y + 1, '<');
+						mat = setAt(mat, x + 1, y + 1, '>');
+						mat = setAt(mat, x, y, '.');
+						mat = setAt(mat, x + 1, y, '.');
+						break;
+					case 'LEFT':
+						mat = setAt(mat, x - 1, y, '<');
+						mat = setAt(mat, x, y, '>');
+						mat = setAt(mat, x + 1, y, '.');
+						break;
+				}
+				break;
+			case '^':
+				switch(direction){
+					case 'UP':
+						mat = setAt(mat, x, y - 1, '^');
+						mat = setAt(mat, x, y, 'v');
+						mat = setAt(mat, x, y + 1, '.');
+						break;
+					case 'LEFT':
+						mat = setAt(mat, x - 1, y, '^');
+						mat = setAt(mat, x - 1, y + 1, 'v');
+						mat = setAt(mat, x, y, '.');
+						mat = setAt(mat, x, y + 1, '.');
+						break;
+					case 'RIGHT':
+						mat = setAt(mat, x + 1, y, '^');
+						mat = setAt(mat, x + 1, y + 1, 'v');
+						mat = setAt(mat, x, y, '.');
+						mat = setAt(mat, x, y + 1, '.');
+						break;
+				}
+				break;
+			case 'v':
+				switch(direction){
+					case 'DOWN':
+						mat = setAt(mat, x, y + 1, 'v');
+						mat = setAt(mat, x, y, '^');
+						mat = setAt(mat, x, y - 1, '.');
+						break;
+				}
+				break;
+			
+			case "1":
+				switch(direction){
+					case "UP":
+						mat = setAt(mat, x, y - 1, '1');
+						mat = setAt(mat, x + 1, y - 1, '2');
+						mat = setAt(mat, x, y, '3');
+						mat = setAt(mat, x + 1, y, '4');
+						mat = setAt(mat, x, y + 1, '.');
+						mat = setAt(mat, x + 1, y + 1, '.');
+						break;
+					case "LEFT":
+						mat = setAt(mat, x - 1, y, '1');
+						mat = setAt(mat, x - 1, y + 1, '3');
+						mat = setAt(mat, x, y, '2');
+						mat = setAt(mat, x, y + 1, '4');
+						mat = setAt(mat, x + 1, y, '.');
+						mat = setAt(mat, x + 1, y + 1, '.');
+						break;
+				}
+				break;
+			case "2":
+				switch(direction){
+					case "RIGHT":
+						mat = setAt(mat, x + 1, y, '2');
+						mat = setAt(mat, x + 1, y + 1, '4');
+						mat = setAt(mat, x, y, '1');
+						mat = setAt(mat, x, y + 1, '3');
+						mat = setAt(mat, x - 1, y, '.');
+						mat = setAt(mat, x - 1, y + 1, '.');
+						break;
+				}
+				break;
+			case "3":
+				switch(direction){
+					case "DOWN":
+						mat = setAt(mat, x, y + 1, '3');
+						mat = setAt(mat, x + 1, y + 1, '4');
+						mat = setAt(mat, x, y, '1');
+						mat = setAt(mat, x + 1, y, '2');
+						mat = setAt(mat, x, y - 1, '.');
+						mat = setAt(mat, x + 1, y - 1, '.');
+						break;
+				}
+				break;
+		}
+		return mat;
+	}
+
+	/** @param {state} grid */
+	function win(grid){return grid[13] == '1'}
+
+	/** @param {state} grid */
+	function hint(grid){
+		if(win(grid)) return null;
+
+		/** @type {Map<state, [state, [number, number, string]]>} */
+		let traversed = new Map([[grid, ["", [-1,-1,"NONE"]]]]);
+		let q = [grid];
+
+		while(q.length != 0){
+			let g = q.shift();
+
+			if(win(g)){
+				while(traversed.get(g)[0] != grid)
+					g = traversed.get(g)[0];
+				return traversed.get(g)[1];
+			}
+			let moves = allowedMoves(g);
+			for(let mv of moves){
+				let g2 = move(g, mv);
+				if(traversed.has(g2)) continue;
+				traversed.set(g2, [g, mv]);
+				q.push(g2);
+			}
+		}
+		throw new Error("PUZZLE IS UNSOLVABLE!");
+	}
+
+	/** @param {state} grid */
+	function hintAsync(grid){
+		let stop = false;
+		return {
+			stop: _=>{stop = true},
+			res: new Promise(resolve=>{
+				if(win(grid) || stop) resolve(null);
+
+				/** @type {Map<state, [state, [number, number, string]]>} */
+				const traversed = new Map([[grid, ["", [-1,-1,"NONE"]]]]);
+				const q = [grid];
+
+				setTimeout(function f(){
+					//Batch 100 steps at a time
+					for(let i = 0; i < 1000; i++){
+						if(q.length == 0 || stop) return resolve(null);
+
+						let g = q.shift();
+						// console.log(g);
+						if(win(g)){
+							// console.log("backtracking");
+							while(traversed.get(g)[0] != grid)
+								g = traversed.get(g)[0];
+							return resolve(traversed.get(g)[1]);
+						}
+						let moves = allowedMoves(g);
+						for(let mv of moves){
+							let g2 = move(g, mv);
+							if(traversed.has(g2)) continue;
+							traversed.set(g2, [g, mv]);
+							q.push(g2);
+						}
+					}
+					setTimeout(f, 0);
+				},0);
+			})
+		}
+	}
+
+	/** @param {state} grid */
+	function getStepsToSolve(grid){
+		if(win(grid)) return [];
+
+		/** @type {Map<state, [string, [number, number, string]]>} */
+		let traversed = new Map([[grid, ["", [-1,-1,"NONE"]]]]);
+		let q = [grid];
+
+		while(q.length != 0){
+			let g = q.shift();
+
+			if(win(g)){
+				let steps = [];
+				let g2;
+				while((g2 = traversed.get(g))[0] != grid){
+					g = g2[0];
+					steps.unshift(g2[1]);
+				}
+				return steps;
+			}
+			let moves = allowedMoves(g);
+			for(let mv of moves){
+				let g2 = move(g, mv);
+				if(traversed.has(g2))
+					continue;
+				traversed.set(g2, [g, mv]);
+				q.push(g2);
+			}
+		}
+		throw new Error("PUZZLE IS UNSOLVABLE!");
+	}
+
+	return {
+		allowedMoves: allowedMoves,
+		getHint : hint,
+		solve : getStepsToSolve,
+		getAt: getAt,
+		setAt: setAt,
+		fromMat: fromMat,
+		fromString: fromString,
+		isWon : win,
+		hintAsync: hintAsync
+	}
+})()
+      class Grid{
+	/** @param {Piece[]} pieces */
+	constructor(pieces){
+		/** @type {boolean[][]} */
+		this.grid = new Array(4).fill([]).map(i=>new Array(5).fill(null));
+		this.pieces = pieces;
+
+		for(let piece of pieces) piece.place(this);
+	}
+
+	/** @param {number} x @param {number} y */
+	getPiece(x, y){
+		return (x > 3 || x < 0 || y > 4 || y < 0) ? null : this.grid[x][y];
+	}
+
+	/** @param {number} x @param {number} y */
+	hasWall(x, y){
+		return (x > 3 || x < 0 || y > 4 || y < 0);
+	}
+
+	/** @param {number} x @param {number} y */
+	hasPiece(x, y){
+		return !this.hasWall(x, y) && this.grid[x][y] != null;
+	}
+
+	/** @param {number} x @param {number} y */
+	hasBlock(x, y){
+		return this.hasWall(x, y) || this.grid[x][y] != null;
+	}
+
+	/** @param {number} x @param {number} y @param {Piece} piece*/
+	setPiece(x, y, piece){
+		this.grid[x][y] = piece;
+	}
+
+	moveL(x, y){
+		if(this.getPiece(x,y) == null) return false;
+		let piece = this.getPiece(x, y);
+		return piece.moveL(this);
+	}
+	moveR(x, y){
+		if(this.getPiece(x,y) == null) return false;
+		let piece = this.getPiece(x, y);
+		return piece.moveR(this);
+	}
+	moveT(x, y){
+		if(this.getPiece(x,y) == null) return false;
+		let piece = this.getPiece(x, y);
+		return piece.moveT(this)
+	}
+	moveB(x, y){
+		if(this.getPiece(x,y) == null) return false;
+		let piece = this.getPiece(x, y);
+		return piece.moveB(this);
+	}
+
+	toString(){
+		let res = ".".repeat(20);
+		for(let piece of this.pieces){
+			let {x,y} = piece;
+			switch(piece.constructor){
+				case SmallPiece:
+					res = Solver.setAt(res, x, y, '@');
+					break;
+				case HorizontalPiece:
+					res = Solver.setAt(res, x, y, '<');
+					res = Solver.setAt(res, x + 1, y, '>');
+					break;
+				case VerticalPiece:
+					res = Solver.setAt(res, x, y, '^');
+					res = Solver.setAt(res, x, y + 1, 'v');
+					break;
+				case LargePiece:
+					res = Solver.setAt(res, x, y, '1');
+					res = Solver.setAt(res, x + 1, y, '2');
+					res = Solver.setAt(res, x, y + 1, '3');
+					res = Solver.setAt(res, x + 1, y + 1, '4');
+					break;
+			}
+		}
+		return res;
+	}
+	fromString(){
+		
+	}
+
+	get isAnimating(){
+		return !this.pieces.every(i=>!i.isAnimating);
+	}
+}
+
+/** @abstract */
+class Piece{
+	/** @param {number} x @param {number} y @param {HTMLElement} el*/
+	constructor(x, y, el){
+		this.el = el;
+		this.px = this.x = x;
+		this.py = this.y = y;
+		this.isAnimating = false;
+		this.el.ontransitionend = _=>{
+			this.isAnimating = false;
+		}
+	}
+
+	get x(){return +this.el.dataset.x}
+	get y(){return +this.el.dataset.y}
+	set x(v){this.el.dataset.x = v; this.isAnimating = true}
+	set y(v){this.el.dataset.y = v; this.isAnimating = true}
+
+	/** @abstract @param {Grid} grid */
+	place(grid){}
+
+	moveL(){this.px = this.x--; return true}
+	moveR(){this.px = this.x++; return true}
+	moveT(){this.py = this.y--; return true}
+	moveB(){this.py = this.y++; return true}
+
+
+	_check(grid, x, y, func){
+		return !grid.hasWall(x, y) && (!grid.hasPiece(x, y) || grid.getPiece(x, y)[func](grid));
+	}
+	check(grid, func, ...positions){
+		return positions.every(([x,y]) => this._check(grid, x, y, func));
+	}
+}
+
+class SmallPiece extends Piece{
+	static dimensions = [1, 1];
+	/** @override */
+	/** @param {Grid} grid */ 
+	place(grid){
+		grid.setPiece(this.x,this.y,this);
+	}
+	/** @override */
+	/** @param {Grid} grid */ 
+	moveL(grid){
+		if(!this.check(grid, "moveL", [this.x - 1, this.y])) return false;
+		grid.setPiece(this.x, this.y, null);
+		grid.setPiece(this.x - 1, this.y, this);
+		return super.moveL();
+	}
+	/** @override */
+	/** @param {Grid} grid */ 
+	moveR(grid){
+		if(!this.check(grid, "moveR", [this.x + 1, this.y])) return false;
+		grid.setPiece(this.x, this.y, null);
+		grid.setPiece(this.x + 1, this.y, this);
+		return super.moveR();
+	}
+	/** @override */
+	/** @param {Grid} grid */ 
+	moveT(grid){
+		if(!this.check(grid, "moveT", [this.x, this.y - 1])) return false;
+		grid.setPiece(this.x, this.y, null);
+		grid.setPiece(this.x, this.y - 1, this);
+		return super.moveT();
+	}
+	/** @override */
+	/** @param {Grid} grid */ 
+	moveB(grid){
+		if(!this.check(grid, "moveB", [this.x, this.y + 1])) return false;
+		grid.setPiece(this.x, this.y, null);
+		grid.setPiece(this.x, this.y + 1, this);
+		return super.moveB();
+	}
+}
+
+class HorizontalPiece extends Piece{
+	static dimensions = [2, 1];
+	/** @override */
+	/** @param {Grid} grid */ 
+	place(grid){
+		grid.setPiece(this.x,this.y,this);
+		grid.setPiece(this.x + 1,this.y,this);
+	}
+	/** @override */
+	/** @param {Grid} grid */ 
+	moveL(grid){
+		if(!this.check(grid, "moveL", [this.x - 1, this.y])) return false;
+		grid.setPiece(this.x + 1, this.y, null);
+		grid.setPiece(this.x - 1, this.y, this);
+		return super.moveL();
+	}
+	/** @override */
+	/** @param {Grid} grid */ 
+	moveR(grid){
+		if(!this.check(grid, "moveR", [this.x + 2, this.y])) return false;
+		grid.setPiece(this.x, this.y, null);
+		grid.setPiece(this.x + 2, this.y, this);
+		return super.moveR();
+	}
+	/** @override */
+	/** @param {Grid} grid */ 
+	moveT(grid){
+		if(!this.check(grid, "moveT", [this.x, this.y - 1], [this.x + 1, this.y - 1])) return false;
+		grid.setPiece(this.x, this.y, null);
+		grid.setPiece(this.x + 1, this.y, null);
+		grid.setPiece(this.x, this.y - 1, this);
+		grid.setPiece(this.x + 1, this.y - 1, this);
+		return super.moveT();
+	}
+	/** @override */
+	/** @param {Grid} grid */ 
+	moveB(grid){
+		if(!this.check(grid, "moveB", [this.x, this.y + 1], [this.x + 1, this.y + 1])) return false;
+		grid.setPiece(this.x, this.y, null);
+		grid.setPiece(this.x + 1, this.y, null);
+		grid.setPiece(this.x, this.y + 1, this);
+		grid.setPiece(this.x + 1, this.y + 1, this);
+		return super.moveB();
+	}
+}
+
+class VerticalPiece extends Piece{
+	static dimensions = [1, 2];
+	/** @override */
+	/** @param {Grid} grid */ 
+	place(grid){
+		grid.setPiece(this.x,this.y,this);
+		grid.setPiece(this.x,this.y + 1,this);
+	}
+	/** @override */
+	/** @param {Grid} grid */ 
+	moveL(grid){
+		if(!this.check(grid, "moveL", [this.x - 1, this.y], [this.x - 1, this.y + 1])) return false;
+		grid.setPiece(this.x, this.y, null);
+		grid.setPiece(this.x, this.y + 1, null);
+		grid.setPiece(this.x - 1, this.y, this);
+		grid.setPiece(this.x - 1, this.y + 1, this);
+		return super.moveL();
+	}
+	/** @override */
+	/** @param {Grid} grid */ 
+	moveR(grid){
+		if(!this.check(grid, "moveR", [this.x + 1, this.y], [this.x + 1, this.y + 1])) return false;
+		grid.setPiece(this.x, this.y, null);
+		grid.setPiece(this.x, this.y + 1, null);
+		grid.setPiece(this.x + 1, this.y, this);
+		grid.setPiece(this.x + 1, this.y + 1, this);
+		return super.moveR();
+	}
+	/** @override */
+	/** @param {Grid} grid */ 
+	moveT(grid){
+		if(!this.check(grid, "moveT", [this.x, this.y - 1])) return false;
+		grid.setPiece(this.x, this.y + 1, null);
+		grid.setPiece(this.x, this.y - 1, this);
+		return super.moveT();
+	}
+	/** @override */
+	/** @param {Grid} grid */ 
+	moveB(grid){
+		if(!this.check(grid, "moveB", [this.x, this.y + 2])) return false;
+		grid.setPiece(this.x, this.y, null);
+		grid.setPiece(this.x, this.y + 2, this);
+		return super.moveB();
+	}
+}
+
+class LargePiece extends Piece{
+	static dimensions = [2, 2];
+	/** @override */
+	/** @param {Grid} grid */ 
+	place(grid){
+		grid.setPiece(this.x,this.y,this);
+		grid.setPiece(this.x,this.y + 1,this);
+		grid.setPiece(this.x + 1,this.y,this);
+		grid.setPiece(this.x + 1,this.y + 1,this);
+	}
+	/** @override */
+	/** @param {Grid} grid */ 
+	moveL(grid){
+		if(!this.check(grid, "moveL", [this.x - 1, this.y], [this.x - 1, this.y + 1])) return false;
+		grid.setPiece(this.x + 1, this.y, null);
+		grid.setPiece(this.x + 1, this.y + 1, null);
+		grid.setPiece(this.x - 1, this.y, this);
+		grid.setPiece(this.x - 1, this.y + 1, this);
+		return super.moveL();
+	}
+	/** @override */
+	/** @param {Grid} grid */ 
+	moveR(grid){
+		if(!this.check(grid, "moveR", [this.x + 2, this.y], [this.x + 2, this.y + 1])) return false;
+		grid.setPiece(this.x, this.y, null);
+		grid.setPiece(this.x, this.y + 1, null);
+		grid.setPiece(this.x + 2, this.y, this);
+		grid.setPiece(this.x + 2, this.y + 1, this);
+		return super.moveR();
+	}
+	/** @override */
+	/** @param {Grid} grid */ 
+	moveT(grid){
+		if(!this.check(grid, "moveT", [this.x, this.y - 1], [this.x + 1, this.y - 1])) return false;
+		grid.setPiece(this.x, this.y + 1, null);
+		grid.setPiece(this.x + 1, this.y + 1, null);
+		grid.setPiece(this.x, this.y - 1, this);
+		grid.setPiece(this.x + 1, this.y - 1, this);
+		return super.moveT();
+	}
+	/** @override */
+	/** @param {Grid} grid */ 
+	moveB(grid){
+		if(!this.check(grid, "moveB", [this.x, this.y + 2], [this.x + 1, this.y + 2])) return false;
+		grid.setPiece(this.x, this.y, null);
+		grid.setPiece(this.x + 1, this.y, null);
+		grid.setPiece(this.x, this.y + 2, this);
+		grid.setPiece(this.x + 1, this.y + 2, this);
+		return super.moveB();
+	}
+}
+      class Level{
+	constructor(name, layout, description){
+		this.name = name;
+		this.s = layout.trim().split('\n').map(i=>i.trim()).join('');
+		this.difficulty = description.difficulty || "Unknown";
+		this.moves = description.moves || "Unknown";
+	}
+	get description(){return `Difficulty: ${this.difficulty}\nMoves: ${this.moves}`}
+	generate(el){
+		while(el.children.length){
+			el.removeChild(el.children[0]);
+		}
+		let pieces = [null];
+		let x = 0, y = 0;
+		for(let i = 0; i < 20; i++){
+			x = i & 3, y = i >> 2;
+			if("^<1@".indexOf(this.s[i]) == -1) continue;
+			
+			let d = document.createElement("div");
+			d.className = {"^":"v","<":"h","1":"l","@":"s"}[this.s[i]] + "-piece";
+			d.setAttribute("data-x",x);
+			d.setAttribute("data-y",y);
+			el.appendChild(d);
+			d.setAttribute("data-index", pieces.length);
+			switch(this.s[i]){
+				case '^':
+					pieces.push(new VerticalPiece(x, y, d));
+					break;
+				case '<':
+					pieces.push(new HorizontalPiece(x, y, d));
+					break;
+				case '1':
+					d.setAttribute("data-index", 0);
+					pieces[0] = new LargePiece(x, y, d);
+					break;
+				case '@':
+					pieces.push(new SmallPiece(x, y, d));
+					break;
+			}
+		}
+		return new Grid(pieces);
+	}
+}
+    </script>
+		
+
+        
+		
+    </head>
+    <body>
+    	<div id="container">
+			<div class="scene glow" id="menu" data-hidden="true">
+				<p id="menu-title">
+					华容道
+				</p>
+				<div id="menu-items">
+					<button class="menu-button" id="play">
+						Play
+					</button>
+					<button class="menu-button" id="instructions">
+						About
+					</button>
+				</div>
+			</div>
+			<div class="scene glow" id="how-to-play" data-hidden="true">
+				<p id="how-to-play-text">
+					华容道 (Huarong Path) is a sliding puzzle invented in the early 20th century.
+					The goal of the game is to move the largest piece (labeled 曹) to the bottom.
+					<br>
+					<br>
+					Coded by NJonathanJiang
+				</p>
+				<button class="menu-button" id="how-to-play-return">
+					Ok
+				</button>
+			</div>
+			<div class="scene" id="level-selection" data-hidden="true" data-blur="true">
+				<div id="level-select-top" class="top glow inner-border">
+					<p id="level-select-title">
+						华容道
+					</p>
+					<button class="game-button" id="select-exit">X</button>
+				</div>
+				<div id="levels" class="glow inner-border"></div>
+			</div>
+			<div class="scene overlay glow" id="level-description" data-hidden="true">
+				<p id="level-description-title">Level ???</p>
+				<div>
+					<div class="game-view" id="level-preview">
+						<div class="l-piece" style="--x:1;--y:0"></div>
+						<div class="v-piece" style="--x:0;--y:0"></div>
+						<div class="v-piece" style="--x:3;--y:0"></div>
+						<div class="v-piece" style="--x:0;--y:2"></div>
+						<div class="v-piece" style="--x:3;--y:2"></div>
+						<div class="h-piece" style="--x:1;--y:2"></div>
+						<div class="s-piece" style="--x:0;--y:4"></div>
+						<div class="s-piece" style="--x:1;--y:3"></div>
+						<div class="s-piece" style="--x:2;--y:3"></div>
+						<div class="s-piece" style="--x:3;--y:4"></div>
+					</div>
+					<div id="level-description-text"></div>
+				</div>
+				<button id="ls-back">Back</button>
+				<button id="ls-next">Play</button>
+			</div>
+			<div class="scene" id="game" data-hidden="true" data-blur="false">
+				<div id="game-top" class="top glow inner-border">
+					<p id="game-level-title">Lorem</p>
+					<div id="game-buttons">
+						<button class="game-button" id="game-goto-menu">☰</button>
+						<span id="game-options">
+							<button class="game-button" id="game-exit">X</button>
+							<button class="game-button" id="game-restart">↺</button>
+						</span>
+						<button class="game-button" id="game-hint">?</button>
+					</div>
+                    <span id="info"></span>
+				</div>
+				<div id="game-container" class="glow inner-border">
+					<div class="game-view" id="game-canvas"></div>
+				</div>
+			</div>
+			<div class="scene overlay glow" id="game-win" data-hidden="true">
+				<p id="solved-text"> Solved! </p>
+				<p id="win-moves"></p>
+				<p id="win-hints"></p>
+				<p id="win-continue"> Click anywhere to continue </p>
+			</div>
+		</div>
+        <script>const LEVELS = (`
+	雄兵百万
+	@@@@
+	@12@
+	@34@
+	@@@@
+	@__@
+	Tutorial 8
+
+	单将挡路
+	@12@
+	@34@
+	@@@@
+	@^_@
+	@v_@
+	Tutorial 16
+
+	四将押曹
+	@12@
+	^34^
+	v@@v
+	^@@^
+	v__v
+	Tutorial 14
+
+	一夫当关
+	@@@@
+	@@@@
+	@@@@
+	<>12
+	__34
+	Tutorial 25
+
+	巧过五关
+	@12@
+	@34@
+	<><>
+	<><>
+	_<>_
+	Easy 25
+	
+	五将逼宫
+	<><>
+	^12^
+	v34v
+	@<>@
+	@__@
+	Easy 34
+	
+	一路顺风
+	^12@
+	v34@
+	^<>^
+	v@^v
+	_@v_
+	Easy 32
+
+	堵塞要道
+	@12@
+	@34@
+	^^<>
+	vv<>
+	_<>_
+	Easy 40
+
+	三军联防
+	12^^
+	34vv
+	<><>
+	@<>@
+	@__@
+	Medium 65
+
+	六将挡路
+	12<>
+	34<>
+	@@__
+	^^<>
+	vv<>
+	Medium 1
+
+	井底之蛙
+	@<>@
+	^12^
+	v34v
+	@<>@
+	_<>_
+	Medium 66
+
+	桃花园中
+	@12@
+	^34^
+	v^^v
+	@vv@
+	_<>_
+	Medium 70
+
+	插翅难飞
+	^12@
+	v34@
+	<>@@
+	^<>^
+	v__v
+	Hard 62
+
+	水泄不通
+	^12@
+	v34@
+	<><>
+	<><>
+	@__@
+	Hard 79
+
+	横刀立马
+	^12^
+	v34v
+	^<>^
+	v@@v
+	@__@
+	Hard 81
+
+	横马当关
+	^12^
+	v34v
+	<><>
+	@^ @
+	@v @
+	Hard 83
+
+	守口如瓶
+	@12@
+	^34^
+	v^_v
+	@v_@
+	<><>
+	Crazy 99
+
+	层层设防
+	@12@
+	^34^
+	v<>v
+	@<>@
+	_<>_
+	Crazy 120
+
+	峰回路转
+	@@@^
+	12^v
+	34v^
+	_<>v
+	_@<>
+	Crazy 138
+	`
+	.trim()
+	.replace(/\n[ \t]+/g,"\n")
+	.split('\n\n')
+	.map(i=>i.split('\n').map(j=>j.trim()))
+	.map(i=>new Level(
+		i[0],
+		i.slice(1,6).join('\n'),
+		{
+			difficulty:i[6].split(' ')[0], 
+			moves: +i[6].split(' ')[1]
+		}
+	))
+);
+          //Get DOM elements
+const el_container = document.getElementById("container");
+const el_scene_menu = document.getElementById("menu");
+const el_scene_how_to_play = document.getElementById("how-to-play");
+const el_scene_level_select = document.getElementById("level-selection");
+const el_scene_level_description = document.getElementById("level-description");
+const el_scene_game = document.getElementById("game");
+const el_scene_game_win = document.getElementById("game-win");
+
+const btn_menu_play = document.getElementById("play");
+const btn_menu_how_to_play = document.getElementById("instructions");
+
+const btn_how_to_play_return = document.getElementById("how-to-play-return");
+
+const btn_level_select_exit = document.getElementById("select-exit");
+
+const el_level_select_levels = document.getElementById("levels");
+
+const btn_level_description_back = document.getElementById("ls-back");
+const btn_level_description_play = document.getElementById("ls-next");
+const p_level_description_title = document.getElementById("level-description-title");
+const p_level_description_text = document.getElementById("level-description-text");
+
+const el_level_description_game_view = document.getElementById("level-preview");
+const el_game_game_view = document.getElementById("game-canvas");
+
+const span_info = document.getElementById("info");
+const p_game_title = document.getElementById("game-level-title");
+
+const btn_game_hint = document.getElementById("game-hint");
+const btn_game_menu = document.getElementById("game-goto-menu");
+const btn_game_exit = document.getElementById("game-exit");
+const btn_game_restart = document.getElementById("game-restart");
+const el_game_options = document.getElementById("game-options");
+
+const p_win_moves = document.getElementById("win-moves");
+const p_win_hints = document.getElementById("win-hints");
+
+function hide(el){el.setAttribute("data-hidden", "true");}
+function show(el){el.setAttribute("data-hidden", "false");}
+function blur(el){el.setAttribute("data-blur", "true");}
+function unblur(el){el.setAttribute("data-blur", "false");}
+
+// Handle resize event
+
+let w, h, s;
+
+let game = new Game(el_container);
+
+// Simple button class
+
+function hint(grid){
+	// If the webassembly version (which is slightly faster) of
+	// getHint has loaded, use that versions
+	if(wasmGetHint) return wasmGetHint(grid.toString());
+	// Otherwise use the plain JS version
+	return Solver.getHint(grid.toString())
+}
+
+function applyMove(grid, move){
+	let [x, y, direction] = move;
+	switch(direction){
+		case "LEFT":
+			g.moveL(x, y); break;
+		case "RIGHT":
+			g.moveR(x, y); break;
+		case "UP":
+			g.moveT(x, y); break;
+		case "DOWN":
+			g.moveB(x, y); break;
+	}
+	animation = 0;
+}
+let usedHints = 0;
+
+let LEVEL;
+let g;
+
+let prevX, prevY;
+
+game.addScene("Menu", new Scene(function(){}, {
+	ui:{
+		buttons: [
+			new UIButton(btn_menu_how_to_play, function(gotoScene){
+				gotoScene("Instructions")
+			}),
+			new UIButton(btn_menu_play, function(gotoScene){
+				gotoScene("LevelSelect");
+			}),
+		]
+	}
+}, function(){
+	hide(el_scene_level_description);
+	hide(el_scene_game);
+	hide(el_scene_game_win);
+	hide(el_scene_level_select);
+	hide(el_scene_how_to_play);
+	
+	show(el_scene_menu)
+}))
+
+game.addScene("Instructions", new Scene(function(){}, {
+	ui:{
+		buttons: [
+			new UIButton(btn_how_to_play_return, function(gotoScene){
+				gotoScene("Menu");
+			}),
+		]
+	}
+}, function(){
+	hide(el_scene_level_description);
+	hide(el_scene_game);
+	hide(el_scene_game_win);
+	hide(el_scene_level_select);
+	hide(el_scene_menu)
+
+	show(el_scene_how_to_play);
+}))
+
+game.addScene("LevelSelect", new Scene(function(){}, {
+	ui : {
+		buttons : [
+			new UIButton(btn_level_select_exit, function(gotoScene){
+				gotoScene("Menu");
+			}),
+			...LEVELS.map((level, i)=>{
+				let btn = document.createElement("button");
+				btn.classList.add("level");
+				btn.classList.add("diff-"+level.difficulty);
+				el_level_select_levels.appendChild(btn);
+				return new UIButton(btn, function(gotoScene, data){
+					data.currLevel = i;
+					gotoScene("LevelDescription");
+				})
+			}),
+		]
+	}
+}, function(){
+	hide(el_scene_menu)
+	hide(el_scene_how_to_play);
+	hide(el_scene_level_description);
+	hide(el_scene_game);
+	hide(el_scene_game_win);
+	
+	unblur(el_scene_level_select);
+	show(el_scene_level_select);
+}))
+
+game.addScene("LevelDescription", new Scene(function(){}, {
+	ui: {
+		buttons : [
+			new UIButton(btn_level_description_back, function(gotoScene, data){
+				data.currLevel = -1;
+				gotoScene("LevelSelect");
+			}),
+			new UIButton(el_scene_level_select, function(gotoScene, data){
+				data.currLevel = -1;
+				gotoScene("LevelSelect");
+			}),
+			new UIButton(btn_level_description_play, function(gotoScene){
+				gotoScene("Level");
+			}),
+		]
+	}
+}, function(data){
+	hide(el_scene_menu)
+	hide(el_scene_how_to_play);
+	hide(el_scene_game);
+	hide(el_scene_game_win);
+
+	LEVELS[data.currLevel].generate(el_level_description_game_view);
+	p_level_description_title.innerText = LEVELS[data.currLevel].name;
+	p_level_description_text.innerText = LEVELS[data.currLevel].description;
+
+	blur(el_scene_level_select);
+	show(el_scene_level_select);
+	show(el_scene_level_description);
+}))
+
+game.addScene("Level", new Scene(function(gotoScene, data){
+	let g = data.gameBoard;
+	if(g.pieces[0].y == 6 && !g.isAnimating) return gotoScene("Win");
+	if(g.pieces[0].x == 1 && g.pieces[0].y == 3 && !g.isAnimating) g.pieces[0].y = 6;
+}, {
+	events: {
+		mousedown : (e, data)=>{
+			data.selectedPiece = data.gameBoard.pieces[e.target.dataset.index]
+			data.mouseDownX = e.clientX - el_game_game_view.getBoundingClientRect().x;
+			data.mouseDownY = e.clientY - el_game_game_view.getBoundingClientRect().y;
+		},
+		mousemove : (e, data) => {
+			let {selectedPiece, mouseDownX, mouseDownY, gameBoard} = data;
+
+			let mx = e.clientX - el_game_game_view.getBoundingClientRect().x;
+			let my = e.clientY - el_game_game_view.getBoundingClientRect().y;
+
+			data.mouseDownX = mx;
+			data.mouseDownY = my;
+
+			if(selectedPiece){
+				if(gameBoard.isAnimating) return;
+
+				let dx = mx - mouseDownX;
+				let dy = my - mouseDownY;
+				
+				let angle = (Math.round(Math.atan2(dy, dx) / Math.PI  * 2) + 2) & 3;
+			
+				if(!g[["moveL","moveT","moveR","moveB"][angle]](selectedPiece.x, selectedPiece.y)) return;
+
+				info.innerText = ++data.moves;
+			}
+		},
+		mouseup : (e, data) => {
+			let {selectedPiece, mouseDownX, mouseDownY, gameBoard} = data;
+			data.selectedPiece = data.mouseDownX = data.mouseDownY = null;
+
+			if(selectedPiece){
+				if(gameBoard.isAnimating) return;
+
+				let dx = e.clientX - el_game_game_view.getBoundingClientRect().x - mouseDownX;
+				let dy = e.clientY - el_game_game_view.getBoundingClientRect().y - mouseDownY;
+				
+				if(dx * dx + dy * dy <= 1) return;	//Prevent small swipe
+
+				let angle = (Math.round(Math.atan2(dy, dx) / Math.PI  * 2) + 2) & 3;
+			
+				if(!g[["moveL","moveT","moveR","moveB"][angle]](selectedPiece.x, selectedPiece.y)) return;
+				
+				info.innerText = ++data.moves;
+			}
+		}
+	},
+	ui: {
+		buttons: [
+			new UIButton(btn_game_exit, function(gotoScene, data){
+				gotoScene("LevelSelect");
+			}),
+			new UIButton(btn_game_hint, function(gotoScene, data){
+				let g = data.gameBoard;
+				if(g.isAnimating) return;
+				applyMove(g, hint(g));
+				data.hints++;
+				info.innerText = ++data.moves;
+			}),
+			new UIButton(btn_game_menu, function(){
+				el_game_options.dataset.extended = !(el_game_options.dataset.extended == "true");
+			}),
+			new UIButton(btn_game_restart, function(gotoScene){
+				gotoScene("Level");
+			}),
+		]
+	}
+}, function(data){
+	hide(el_scene_menu)
+	hide(el_scene_how_to_play);
+	hide(el_scene_level_select);
+	hide(el_scene_level_description);
+	hide(el_scene_game_win);
+	
+	p_game_title.innerText = LEVELS[data.currLevel].name;
+
+	el_game_options.dataset.extended = "false";
+	
+	g = data.gameBoard = LEVELS[data.currLevel].generate(el_game_game_view);
+	info.innerText = data.moves = 0;
+	data.hints = 0;
+	
+	unblur(el_scene_game);
+	show(el_scene_game);
+}));
+
+game.addScene("Win", new Scene(_=>{
+
+}, {
+	events: {
+		click : _=>{
+			document.title = "华容道（Klotski)"
+			return "LevelSelect";
+		}
+	}
+}, function(data){
+	hide(el_scene_menu)
+	hide(el_scene_how_to_play);
+	hide(el_scene_level_select);
+	hide(el_scene_level_description);
+	
+	blur(el_scene_game);
+	show(el_scene_game);
+	show(el_scene_game_win);
+
+	p_win_moves.innerText = data.moves;
+	p_win_hints.innerText = data.hints;
+}));
+
+// game.run("Level");
+game.run("Menu");
+      </script>
+
+	</body>
+</html>
