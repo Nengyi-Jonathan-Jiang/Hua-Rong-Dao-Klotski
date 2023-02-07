@@ -101,7 +101,7 @@ const LEVELS = (`
 	<>@@
 	^<>^
 	v__v
-	Hard 62
+	Hard 51
 
 	水泄不通
 	^12@
@@ -109,7 +109,7 @@ const LEVELS = (`
 	<><>
 	<><>
 	@__@
-	Hard 79
+	Hard 74
 
 	横刀立马
 	^12^
@@ -117,7 +117,7 @@ const LEVELS = (`
 	^<>^
 	v@@v
 	@__@
-	Hard 81
+	Hard 80
 
 	横马当关
 	^12^
