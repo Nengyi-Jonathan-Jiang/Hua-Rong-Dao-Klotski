@@ -77,7 +77,7 @@ const LEVELS = (`
 	@@__
 	^^<>
 	vv<>
-	Medium 1
+	Medium 29
 
 	井底之蛙
 	@<>@
@@ -85,7 +85,7 @@ const LEVELS = (`
 	v34v
 	@<>@
 	_<>_
-	Medium 66
+	Medium 60
 
 	桃花园中
 	@12@
@@ -93,7 +93,7 @@ const LEVELS = (`
 	v^^v
 	@vv@
 	_<>_
-	Medium 70
+	Medium 68
 
 	插翅难飞
 	^12@
