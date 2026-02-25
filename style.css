@@ -252,6 +252,7 @@ button.level::after{
 	transform: translate(-50%, -50%);
 	top: 50%;
 	left: 50%;
+	text-shadow: 0 0 4px #0006;
 }
 
 .game-view>div.s-piece{
@@ -291,8 +292,6 @@ div[data-blur="true"]{
 
 .game-view#level-preview>div {
 	color: transparent;
-	-webkit-text-fill-color: transparent;
-	-webkit-text-stroke-width: 0;
 }
 
 p#level-description-title{
