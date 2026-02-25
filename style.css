@@ -294,6 +294,10 @@ div[data-blur="true"]{
 	color: transparent;
 }
 
+.game-view#level-preview>div::after {
+	text-shadow: none;
+}
+
 p#level-description-title{
 	font-size: calc(var(--w) * 0.05);
 	margin: 0;
